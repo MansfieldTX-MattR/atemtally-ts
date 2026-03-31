@@ -5,6 +5,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "build": "turbo run build",
+    "start": "turbo run start",
     "dev": "turbo run dev",
     "typecheck": "turbo run typecheck",
     "clean": "turbo run clean && pnpm clean-root",
