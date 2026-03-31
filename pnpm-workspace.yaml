@@ -5,6 +5,10 @@ packages:
 onlyBuiltDependencies:
   - "tsl-umd-v5"
 
+ignoredBuiltDependencies:
+  - sharp
+  - unrs-resolver
+
 allowBuilds:
   '@julusian/freetype2': false
 
