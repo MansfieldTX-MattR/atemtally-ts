@@ -1,12 +1,15 @@
 
 import exitHook from "exit-hook";
+import type { Server } from "node:http";
 import { AtemController } from "./atem";
 import { TallyTSLMapper, TallyTSLBridge } from "./tally";
 import { Config } from "./config";
+import { createApp, startServer, stopServer } from "./api";
 
 interface AppContext {
   atemController: AtemController;
   tslBridge: TallyTSLBridge;
+  apiServer: Server;
 }
 
 async function startup(): Promise<AppContext> {
@@ -23,7 +26,9 @@ async function startup(): Promise<AppContext> {
   });
   tslBridge.sendAllTalliesOff(); // Ensure all tallies are off on startup
   await atemController.connect();
-  return { atemController, tslBridge };
+  const app = createApp({ tslMapper, tslBridge });
+  const apiServer = await startServer(app, 3000);
+  return { atemController, tslBridge, apiServer };
 }
 
 async function shutdown(context: AppContext|null): Promise<void> {
@@ -35,6 +40,7 @@ async function shutdown(context: AppContext|null): Promise<void> {
   context.tslBridge.sendAllTalliesOff();
   // Clean up resources, close connections, etc.
   console.log("Shutting down application...");
+  await stopServer(context.apiServer);
   await context.atemController.disconnect();
   console.log("Application shutdown complete");
 }

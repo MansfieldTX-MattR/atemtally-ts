@@ -1,6 +1,6 @@
 
 type TSL5TallyColor = 0 | 1 | 2 | 3;
-type TSL5TallyType = "rh_tally" | "text_tally" | "lh_tally";
+export type TSL5TallyType = "rh_tally" | "text_tally" | "lh_tally";
 
 export type TallyIndex = number;
 export type MixEngineIndex = number;

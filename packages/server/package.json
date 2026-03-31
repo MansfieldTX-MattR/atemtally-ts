@@ -14,14 +14,16 @@
   "dependencies": {
     "atem-connection": "^3.9.0",
     "exit-hook": "^5.1.0",
+    "express": "^5.2.1",
     "tsl-umd-v5": "catalog:"
   },
   "devDependencies": {
+    "@atemtally/common": "workspace:*",
     "@tsconfig/node22": "catalog:",
     "@types/debug": "catalog:",
+    "@types/express": "^5.0.6",
     "@types/node": "catalog:",
     "ts-node": "catalog:",
-    "typescript": "catalog:",
-    "@atemtally/common": "workspace:*"
+    "typescript": "catalog:"
   }
 }
