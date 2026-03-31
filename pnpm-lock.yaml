@@ -40,9 +40,6 @@ importers:
       ts-node:
         specifier: 'catalog:'
         version: 10.9.2(@types/node@25.5.0)(typescript@6.0.2)
-      tsl-umd-v5:
-        specifier: 'catalog:'
-        version: https://codeload.github.com/MansfieldTX-MattR/tsl-umd-v5/tar.gz/0a5333ceb8e8d4c48dca81b2d894cbe61a6e05cc
       typescript:
         specifier: 'catalog:'
         version: 6.0.2

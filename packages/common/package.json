@@ -14,7 +14,6 @@
     "@tsconfig/node22": "catalog:",
     "@types/node": "catalog:",
     "ts-node": "catalog:",
-    "typescript": "catalog:",
-    "tsl-umd-v5": "catalog:"
+    "typescript": "catalog:"
   }
 }
