@@ -10,51 +10,24 @@ import type {
 } from "tsl-umd-v5";
 import TSL5 from "tsl-umd-v5";
 
-export type TallyIndex = number;
-export type MixEngineIndex = number;
-export type TallyMEId = string; // `${mixEngineIndex}-${inputIndex}`
-
-const getTallyMEId = (mixEngineIndex: MixEngineIndex, inputIndex: TallyIndex): TallyMEId => {
-  return `${mixEngineIndex}-${inputIndex}`;
-};
-
-const parseTallyMEId = (tallyMEId: TallyMEId): [MixEngineIndex, TallyIndex] => {
-  const [mixEngineIndexStr, inputIndexStr] = tallyMEId.split("-");
-  return [parseInt(mixEngineIndexStr), parseInt(inputIndexStr)];
-}
-
-export type TallyBus = "program" | "preview";
-
-export enum TallyColor {
-  OFF = 0,
-  RED = 1,
-  GREEN = 2,
-  AMBER = 1 | 2,
-}
-
-function tallyColorToValue(color: TallyColor): TSL5TallyColor {
-  switch (color) {
-    case TallyColor.OFF:
-      return 0;
-    case TallyColor.RED:
-      return 1;
-    case TallyColor.GREEN:
-      return 2;
-    case TallyColor.AMBER:
-      return 3;
-    default:
-      throw new Error(`Invalid tally color: ${color}`);
-  }
-}
+import type {
+  Tally,
+  TallyIndex,
+  MixEngineIndex,
+  TallyMEId,
+  TallyBus,
+  TallyTSLMapItem,
+  TallyTSLMap,
+  HostPort,
+} from "@atemtally/common";
+import {
+  TallyColor,
+  getTallyMEId,
+  parseTallyMEId,
+  tallyColorToValue
+} from "@atemtally/common";
 
 
-export interface Tally {
-  inputIndex: TallyIndex;
-  mixEngineIndex: MixEngineIndex;
-  busses: TallyBus[];
-  color: TallyColor;
-  name: string;
-}
 interface TallyWithoutName extends Omit<Tally, "name"> {}
 
 export function getTallyColors(atem: Atem, meIndex: MixEngineIndex, filterInputs?: TallyIndex[]): Map<TallyIndex, TallyWithoutName> {
@@ -201,15 +174,7 @@ type TSL5TallyDisplayPartial = {
   [Property in TSL5TallyType]?: TSL5TallyColor;
 }
 
-export interface TallyTSLMapItem {
-  tallyId: TallyMEId;
-  bus: TallyBus;
-  screen: number;
-  index: number;
-  tallyType: TSL5TallyType;
-  tallyColor: TallyColor;
-}
-export type TallyTSLMap = TallyTSLMapItem[];
+
 // export type TallyTSLMap = {
 //   [tallyId: TallyMEId]: TallyTSLMapItem;
 // }
@@ -306,10 +271,6 @@ export class TallyTSLMapper {
   }
 }
 
-export interface HostPort {
-  host: string;
-  port: number;
-}
 
 export class TallyTSLBridge {
   private mapper: TallyTSLMapper;

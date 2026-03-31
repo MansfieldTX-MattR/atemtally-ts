@@ -19,6 +19,7 @@
     "@types/debug": "catalog:",
     "@types/node": "catalog:",
     "ts-node": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "@atemtally/common": "workspace:*"
   }
 }

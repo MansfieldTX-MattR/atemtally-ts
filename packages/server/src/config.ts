@@ -1,15 +1,9 @@
 import fs from "fs";
 
 import type {
-  TallyTSLMapItem,
   TallyTSLMap,
-  TallyBus,
   HostPort,
-  TallyMEId,
-} from "./tally";
-
-
-
+} from "@atemtally/common";
 
 
 

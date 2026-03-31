@@ -3,8 +3,8 @@
 import { EventEmitter } from 'node:events';
 import { Atem, AtemState, AtemConnectionStatus } from 'atem-connection';
 
-import type { Tally, TallyBus, TallyColor } from './tally';
-import { TallyCollection, getTallyColors } from './tally';
+import type { Tally } from '@atemtally/common';
+import { TallyCollection } from './tally';
 
 type AtemAddress = string;
 
