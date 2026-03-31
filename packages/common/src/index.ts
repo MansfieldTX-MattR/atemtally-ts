@@ -7,9 +7,9 @@ export type {
   TallyBus,
   TallyTSLMapItem,
   TallyTSLMap,
-} from "./tally";
+} from "./tally.js";
 
-export * from "./tally";
+export * from "./tally.js";
 
 export type {
   MapTallyRequestBody,
@@ -17,9 +17,9 @@ export type {
   GetTSLMapResponse,
   SendAllOffResponse,
   ErrorResponse,
-} from "./api";
+} from "./api.js";
 
-export * from "./api";
+export * from "./api.js";
 
 
 export interface HostPort {

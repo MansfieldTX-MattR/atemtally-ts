@@ -1,8 +1,7 @@
 import express, { type Express, type Request, type Response } from "express";
 import type { Server } from "node:http";
 import type { TallyTSLMapper, TallyTSLBridge } from "./tally";
-import type { Tally } from "@atemtally/common";
-import { TallyColor } from "@atemtally/common";
+import type { Tally, TallyColor } from "@atemtally/common";
 import type {
   MapTallyRequestBody,
   MapTallyResponse,

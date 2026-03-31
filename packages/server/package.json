@@ -2,12 +2,11 @@
   "name": "@atemtally/server",
   "version": "1.0.0",
   "main": "dist/index.js",
-  "type": "commonjs",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "build": "tsc",
     "start": "node dist/index.js",
-    "dev": "ts-node src/index.ts",
+    "dev": "tsx src/index.ts",
     "typecheck": "tsc --noEmit",
     "clean": "rimraf node_modules dist .turbo tsconfig.tsbuildinfo"
   },
@@ -24,6 +23,7 @@
     "@types/express": "^5.0.6",
     "@types/node": "catalog:",
     "ts-node": "catalog:",
+    "tsx": "^4.21.0",
     "typescript": "catalog:"
   }
 }

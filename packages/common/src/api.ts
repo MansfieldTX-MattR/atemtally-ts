@@ -6,7 +6,7 @@ import type {
   TallyColor,
   TallyTSLMapItem,
   TSL5TallyType,
-} from "./tally";
+} from "./tally.js";
 
 export interface MapTallyRequestBody {
   inputIndex: TallyIndex;
