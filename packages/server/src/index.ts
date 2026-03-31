@@ -61,21 +61,3 @@ startup()
   .catch((error) => {
     console.error("Failed to start application:", error);
   });
-
-process.on('SIGINT', () => {
-  new Promise<void>((resolve) => {
-    console.log("SIGINT received, shutting down...");
-    shutdown(appContext).then(resolve);
-  }).then(() => {
-    process.exit(0);
-  });
-});
-
-process.on('SIGTERM', () => {
-  new Promise<void>((resolve) => {
-    console.log("SIGTERM received, shutting down...");
-    shutdown(appContext).then(resolve);
-  }).then(() => {
-    process.exit(0);
-  });
-});
