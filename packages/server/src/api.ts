@@ -15,11 +15,22 @@ interface ApiDeps {
   tslBridge: TallyTSLBridge;
 }
 
+interface ParamsDictionary {
+    [key: string]: string | string[];
+    [key: number]: string;
+}
+
+// Shorthand types for API request and response objects.
+// ApiRequest moves RequestBody and ResponseBody to the front and allows for an optional ParamsDictionary type parameter.
+type ApiRequest<TReqBody, TResBody, P = ParamsDictionary> = Request<P, TResBody | ErrorResponse, TReqBody>;
+type ApiResponse<T> = Response<T | ErrorResponse>;
+
+
 export function createApp(deps: ApiDeps): Express {
   const app = express();
   app.use(express.json());
 
-  app.post("/api/tally/map", (req: Request<{}, MapTallyResponse | ErrorResponse, MapTallyRequestBody>, res: Response<MapTallyResponse | ErrorResponse>) => {
+  app.post("/api/tally/map", (req: ApiRequest<MapTallyRequestBody, MapTallyResponse>, res: ApiResponse<MapTallyResponse>) => {
     const { inputIndex, mixEngineIndex, busses, color, name, bus, tallyType } = req.body;
     if (inputIndex == null || mixEngineIndex == null || !bus || color == null) {
       res.status(400).json({ error: "Missing required fields: inputIndex, mixEngineIndex, bus, color" });
@@ -36,7 +47,7 @@ export function createApp(deps: ApiDeps): Express {
     res.json(result);
   });
 
-  app.get("/api/tally/map", (_req: Request, res: Response<GetTSLMapResponse>) => {
+  app.get("/api/tally/map", (_req: Request, res: ApiResponse<GetTSLMapResponse>) => {
     const tslMap = deps.tslMapper.getTSLMap();
     const mapObj: GetTSLMapResponse = {};
     for (const [key, value] of tslMap.entries()) {
@@ -45,7 +56,7 @@ export function createApp(deps: ApiDeps): Express {
     res.json(mapObj);
   });
 
-  app.post("/api/tally/off", (_req: Request, res: Response<SendAllOffResponse>) => {
+  app.post("/api/tally/off", (_req: Request, res: ApiResponse<SendAllOffResponse>) => {
     deps.tslBridge.sendAllTalliesOff();
     res.json({ ok: true });
   });
