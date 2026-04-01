@@ -31,33 +31,28 @@ const debug = createDebug("atemtally:tally");
 type TallyWithoutName = Omit<Tally, "name">;
 
 export function getTallyColors(atem: Atem, meIndex: MixEngineIndex): Map<TallyIndex, TallyWithoutName> {
-  const tallyColors: Map<TallyIndex, TallyColor> = new Map();
   const previewInputs = new Set(atem.listVisibleInputs('preview', meIndex));
   const programInputs = new Set(atem.listVisibleInputs('program', meIndex));
   const allInputs = new Set([...previewInputs, ...programInputs]);
 
-  const result: Map<TallyIndex, TallyWithoutName> = new Map();
-
-  for (const input of allInputs) {
-    let tally: TallyColor = TallyColor.OFF;
+  return new Map(Array.from(allInputs).map(input => {
     const busses: TallyBus[] = [];
+    let color: TallyColor = TallyColor.OFF;
     if (programInputs.has(input)) {
-      tally |= TallyColor.RED;
+      color |= TallyColor.RED;
       busses.push("program");
     }
     if (previewInputs.has(input)) {
-      tally |= TallyColor.GREEN;
+      color |= TallyColor.GREEN;
       busses.push("preview");
     }
-    tallyColors.set(input, tally);
-    result.set(input, {
+    return [input, {
       inputIndex: input,
       mixEngineIndex: meIndex,
       busses,
-      color: tally,
-    });
-  }
-  return result;
+      color,
+    }];
+  }));
 }
 
 interface TallyCollectionEvents {
