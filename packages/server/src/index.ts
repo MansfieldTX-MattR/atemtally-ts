@@ -29,6 +29,7 @@ async function startup(): Promise<AppContext> {
   });
   tslBridge.sendAllTalliesOff(); // Ensure all tallies are off on startup
   await atemController.connect();
+  debug("Starting API server...");
   const app = createApp({ tslMapper, tslBridge });
   const apiServer = await startServer(app, 3000);
   return { atemController, tslBridge, apiServer };
@@ -44,7 +45,10 @@ async function shutdown(context: AppContext|null): Promise<void> {
   // Clean up resources, close connections, etc.
   debug("Shutting down application...");
   await stopServer(context.apiServer);
-  await context.atemController.disconnect();
+  if (context.atemController.connected) {
+    debug("Disconnecting from ATEM...");
+    await context.atemController.disconnect();
+  }
   debug("Application shutdown complete");
 }
 

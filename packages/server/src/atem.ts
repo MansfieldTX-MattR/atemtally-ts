@@ -46,15 +46,28 @@ export class AtemController extends EventEmitter<AtemEvents> {
     //   }),
     // };
     this.atem.on('connected', () => {
+      debug(`Connected to ATEM at ${this.address}`);
       this.emit('connected');
       this.emit('statusChanged', this.atem.status);
+      const state = this.atem.state;
+      if (state === undefined) {
+        debug(`Failed to retrieve state from ATEM at ${this.address} on connect`);
+        return;
+      }
+      if (!this.tallyCollection.initialized) {
+        this.tallyCollection.initialize(this.atem, state);
+      } else {
+        this.tallyCollection.updateTallies(this.atem, 0);
+      }
     });
     this.atem.on('disconnected', () => {
+      debug(`Disconnected from ATEM at ${this.address}`);
       this.emit('disconnected');
       this.emit('statusChanged', this.atem.status);
     });
 
     this.atem.on('error', (error) => {
+      debug(`Error with ATEM at ${this.address}:`, error);
       this.emit('error', error);
       this.emit('statusChanged', this.atem.status);
     });
@@ -62,29 +75,9 @@ export class AtemController extends EventEmitter<AtemEvents> {
   }
 
   async connect(): Promise<void> {
+    debug(`Attempting to connect to ATEM at ${this.address}...`);
     try {
-      const connectionPromise = new Promise<void>((resolve, reject) => {
-        this.atem.once('connected', () => {
-          debug(`ATEM connected event received for ${this.address}`);
-          resolve();
-        });
-        this.atem.once('error', (error) => {
-          debug(`ATEM error event received for ${this.address}:`, error);
-          reject(error);
-        });
-      });
       await this.atem.connect(this.address);
-      // await this.coreEvents.connected;
-      await connectionPromise;
-      if (this.atem.status !== AtemConnectionStatus.CONNECTED) {
-        throw new Error(`Failed to connect to ATEM at ${this.address}`);
-      }
-      debug(`Connected to ATEM at ${this.address}`);
-      const state = this.atem.state;
-      if (state === undefined) {
-        throw new Error(`Failed to retrieve state from ATEM at ${this.address}`);
-      }
-      this.tallyCollection.initialize(this.atem, state);
     } catch (error) {
       debug(`Failed to connect to ATEM at ${this.address}:`, error);
       throw error;
