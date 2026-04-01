@@ -23,7 +23,7 @@ export default function MapTallyForm({ loading, onSubmit }: MapTallyFormProps) {
   const [name, setName] = useState("");
   const [mapResult, setMapResult] = useState<TallyTSLMapItem | null>(null);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     setMapResult(null);
     const body: MapTallyRequestBody = {
