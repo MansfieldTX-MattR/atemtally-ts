@@ -66,12 +66,16 @@ interface TallyCollectionEvents {
 
 export class TallyCollection extends EventEmitter <TallyCollectionEvents> {
   private tallies: Map<TallyMEId, Tally>;
-  private initialized: boolean;
+  private _initialized: boolean;
 
   constructor() {
     super();
     this.tallies = new Map();
-    this.initialized = false;
+    this._initialized = false;
+  }
+
+  get initialized(): boolean {
+    return this._initialized;
   }
 
   initialize(atem: Atem, state: Readonly<AtemState>) {
@@ -109,14 +113,14 @@ export class TallyCollection extends EventEmitter <TallyCollectionEvents> {
       }
     }
     this._updateTallies(atem, 0);
-    this.initialized = true;
+    this._initialized = true;
   }
 
   updateTallies(atem: Atem, meIndex: MixEngineIndex) {
-    if (!this.initialized) {
+    if (!this._initialized) {
       return;
     }
-    this._updateTallies(atem, meIndex, filterInputs);
+    this._updateTallies(atem, meIndex);
   }
 
   _updateTallies(atem: Atem, meIndex: MixEngineIndex) {
