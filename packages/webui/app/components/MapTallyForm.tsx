@@ -42,78 +42,52 @@ export default function MapTallyForm({ loading, onSubmit }: MapTallyFormProps) {
     <section>
       <h2 className="text-xl font-semibold mb-4">Map Tally to TSL</h2>
       <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4 max-w-lg">
-        <label className="flex flex-col gap-1">
-          <span className="text-sm font-medium">Input Index</span>
-          <input
-            type="number"
-            value={inputIndex}
-            onChange={(e) => setInputIndex(Number(e.target.value))}
-            className="rounded border border-zinc-300 px-3 py-1.5 dark:border-zinc-600 dark:bg-zinc-800"
-          />
-        </label>
-        <label className="flex flex-col gap-1">
-          <span className="text-sm font-medium">Mix Engine Index</span>
-          <input
-            type="number"
-            value={mixEngineIndex}
-            onChange={(e) => setMixEngineIndex(Number(e.target.value))}
-            className="rounded border border-zinc-300 px-3 py-1.5 dark:border-zinc-600 dark:bg-zinc-800"
-          />
-        </label>
-        <label className="flex flex-col gap-1">
-          <span className="text-sm font-medium">Color</span>
-          <select
-            value={color}
-            onChange={(e) => setColor(Number(e.target.value) as TallyColor)}
-            className="rounded border border-zinc-300 px-3 py-1.5 dark:border-zinc-600 dark:bg-zinc-800"
-          >
-            <option value={TallyColor.OFF}>Off</option>
-            <option value={TallyColor.RED}>Red</option>
-            <option value={TallyColor.GREEN}>Green</option>
-            <option value={TallyColor.AMBER}>Amber</option>
-          </select>
-        </label>
-        <label className="flex flex-col gap-1">
-          <span className="text-sm font-medium">Bus</span>
-          <select
-            value={bus}
-            onChange={(e) => setBus(e.target.value as TallyBus)}
-            className="rounded border border-zinc-300 px-3 py-1.5 dark:border-zinc-600 dark:bg-zinc-800"
-          >
-            <option value="program">Program</option>
-            <option value="preview">Preview</option>
-          </select>
-        </label>
-        <label className="flex flex-col gap-1">
-          <span className="text-sm font-medium">Tally Type</span>
-          <select
-            value={tallyType}
-            onChange={(e) => setTallyType(e.target.value as TSL5TallyType)}
-            className="rounded border border-zinc-300 px-3 py-1.5 dark:border-zinc-600 dark:bg-zinc-800"
-          >
-            <option value="rh_tally">RH Tally</option>
-            <option value="lh_tally">LH Tally</option>
-            <option value="text_tally">Text Tally</option>
-          </select>
-        </label>
-        <label className="flex flex-col gap-1">
-          <span className="text-sm font-medium">Name (optional)</span>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="rounded border border-zinc-300 px-3 py-1.5 dark:border-zinc-600 dark:bg-zinc-800"
-          />
-        </label>
-        <div className="col-span-2">
-          <button
-            type="submit"
-            disabled={loading}
-            className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-          >
-            Map Tally
-          </button>
-        </div>
+        <NumberField
+          label="Input Index"
+          value={inputIndex}
+          onChange={setInputIndex}
+        />
+        <NumberField
+          label="Mix Engine Index"
+          value={mixEngineIndex}
+          onChange={setMixEngineIndex}
+        />
+        <SelectField
+          label="Color"
+          value={color}
+          onChange={setColor}
+          options={[
+            { label: "Off", value: TallyColor.OFF },
+            { label: "Red", value: TallyColor.RED },
+            { label: "Green", value: TallyColor.GREEN },
+            { label: "Amber", value: TallyColor.AMBER },
+          ]}
+        />
+        <SelectField
+          label="Bus"
+          value={bus}
+          onChange={setBus}
+          options={[
+            { label: "Program", value: "program" },
+            { label: "Preview", value: "preview" },
+          ]}
+        />
+        <SelectField
+          label="Tally Type"
+          value={tallyType}
+          onChange={setTallyType}
+          options={[
+            { label: "RH Tally", value: "rh_tally" },
+            { label: "LH Tally", value: "lh_tally" },
+            { label: "Text Tally", value: "text_tally" },
+          ]}
+        />
+        <TextField
+          label="Name (optional)"
+          value={name}
+          onChange={setName}
+        />
+        <SubmitField label="Map Tally" loading={loading} />
       </form>
       {mapResult && (
         <pre className="mt-4 rounded bg-zinc-100 p-4 text-sm overflow-x-auto dark:bg-zinc-800">
@@ -121,5 +95,101 @@ export default function MapTallyForm({ loading, onSubmit }: MapTallyFormProps) {
         </pre>
       )}
     </section>
+  );
+}
+
+
+interface FormFieldProps<T> {
+  label: string;
+  value: T;
+  onChange: (v: T) => void;
+  children?: React.ReactNode;
+  className?: string;
+  fieldClassName?: string;
+}
+
+const FormFieldDefaults = {
+  className: "flex flex-col gap-1",
+  fieldClassName: "rounded border border-zinc-300 px-3 py-1.5 dark:border-zinc-600 dark:bg-zinc-800",
+};
+
+function FormField<T> ({ label, children, className }: FormFieldProps<T>) {
+  return (
+    <label className={`${FormFieldDefaults.className} ${className ?? ""}`}>
+      <span className="text-sm font-medium">{label}</span>
+      {children}
+    </label>
+  );
+}
+
+function TextField({ label, value, onChange, className, fieldClassName }: FormFieldProps<string>) {
+  return (
+    <FormField label={label} value={value} onChange={onChange} className={className}>
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className={`${FormFieldDefaults.fieldClassName} ${fieldClassName ?? ""}`}
+      />
+    </FormField>
+  );
+}
+
+function NumberField<T extends number>({ label, value, onChange, className, fieldClassName }: FormFieldProps<T>) {
+  return (
+    <FormField label={label} value={value} onChange={onChange} className={className}>
+      <input
+        type="number"
+        value={value}
+        onChange={(e) => onChange(typeof value === "number" ? Number(e.target.value) as T : (e.target.value as unknown as T))}
+        className={`${FormFieldDefaults.fieldClassName} ${fieldClassName ?? ""}`}
+      />
+    </FormField>
+  );
+}
+
+interface SelectFieldOption<T> {
+  label: string;
+  value: T;
+}
+
+interface SelectFieldProps<T extends string | number> extends FormFieldProps<T> {
+  options: SelectFieldOption<T>[];
+}
+
+function SelectField<T extends string | number> ({ label, value, onChange, options, className, fieldClassName }: SelectFieldProps<T>) {
+  return (
+    <FormField label={label} value={value} onChange={onChange} className={className}>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value as unknown as T)}
+        className={`${FormFieldDefaults.fieldClassName} ${fieldClassName ?? ""}`}
+      >
+        {options.map((opt) => (
+          <option key={String(opt.value)} value={String(opt.value)}>
+            {opt.label}
+          </option>
+        ))}
+      </select>
+    </FormField>
+  );
+}
+
+
+function SubmitField(
+  { label, loading, className, fieldClassName }:
+  { label: string; loading: boolean; className?: string; fieldClassName?: string }
+) {
+  const defaultFieldClass = "rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50";
+  return (
+    <div className={`col-span-2 ${className ?? ""}`}>
+      <button
+        type="submit"
+        disabled={loading}
+        className={`${defaultFieldClass} ${fieldClassName ?? ""}`}
+      >
+        {label}
+      </button>
+    </div>
   );
 }
