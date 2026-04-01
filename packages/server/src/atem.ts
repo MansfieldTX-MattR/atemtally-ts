@@ -1,5 +1,4 @@
-// import type {  } from 'atem-connection';
-// import type { Event}
+import { debug as createDebug } from "debug";
 import { EventEmitter } from 'node:events';
 import { Atem, AtemState, AtemConnectionStatus } from 'atem-connection';
 
@@ -8,6 +7,7 @@ import { TallyCollection } from './tally';
 
 type AtemAddress = string;
 
+const debug = createDebug("atemtally:atem");
 
 
 
@@ -32,8 +32,6 @@ export class AtemController extends EventEmitter<AtemEvents> {
     this.atem = new Atem();
     this.tallyCollection = new TallyCollection();
     this.tallyCollection.on('tallyUpdated', (tallies) => {
-      // this.emit('tallyUpdated', tally);
-      // console.log('Tally updated:', tallies);
       this.emit('tallyUpdated', tallies);
     });
     // this.coreEvents = {
@@ -67,11 +65,11 @@ export class AtemController extends EventEmitter<AtemEvents> {
     try {
       const connectionPromise = new Promise<void>((resolve, reject) => {
         this.atem.once('connected', () => {
-          console.log(`ATEM connected event received for ${this.address}`);
+          debug(`ATEM connected event received for ${this.address}`);
           resolve();
         });
         this.atem.once('error', (error) => {
-          console.error(`ATEM error event received for ${this.address}:`, error);
+          debug(`ATEM error event received for ${this.address}:`, error);
           reject(error);
         });
       });
@@ -81,14 +79,14 @@ export class AtemController extends EventEmitter<AtemEvents> {
       if (this.atem.status !== AtemConnectionStatus.CONNECTED) {
         throw new Error(`Failed to connect to ATEM at ${this.address}`);
       }
-      console.log(`Connected to ATEM at ${this.address}`);
+      debug(`Connected to ATEM at ${this.address}`);
       const state = this.atem.state;
       if (state === undefined) {
         throw new Error(`Failed to retrieve state from ATEM at ${this.address}`);
       }
       this.tallyCollection.initialize(this.atem, state);
     } catch (error) {
-      console.error(`Failed to connect to ATEM at ${this.address}:`, error);
+      debug(`Failed to connect to ATEM at ${this.address}:`, error);
       throw error;
     }
   }
@@ -96,9 +94,9 @@ export class AtemController extends EventEmitter<AtemEvents> {
   async disconnect(): Promise<void> {
     try {
       await this.atem.disconnect();
-      console.log(`Disconnected from ATEM at ${this.address}`);
+      debug(`Disconnected from ATEM at ${this.address}`);
     } catch (error) {
-      console.error(`Failed to disconnect from ATEM at ${this.address}:`, error);
+      debug(`Failed to disconnect from ATEM at ${this.address}:`, error);
       throw error;
     }
   }
@@ -108,7 +106,6 @@ export class AtemController extends EventEmitter<AtemEvents> {
   }
 
   onStateChange(state: AtemState): void { // eslint-disable-line @typescript-eslint/no-unused-vars
-    // console.log('ATEM state changed:', state);
     this.tallyCollection.updateTallies(this.atem, 0);
   }
 }

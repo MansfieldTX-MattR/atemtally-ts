@@ -1,10 +1,14 @@
-
+import { debug as createDebug } from "debug";
 import exitHook from "exit-hook";
 import type { Server } from "node:http";
 import { AtemController } from "./atem";
 import { TallyTSLMapper, TallyTSLBridge } from "./tally";
 import { Config } from "./config";
 import { createApp, startServer, stopServer } from "./api";
+
+const debug = createDebug("atemtally:index");
+createDebug.enable("atemtally:*");
+
 
 interface AppContext {
   atemController: AtemController;
@@ -19,7 +23,6 @@ async function startup(): Promise<AppContext> {
   const atemController = new AtemController(config.atemAddress);
   const tslMapper = new TallyTSLMapper();
   tslMapper.loadTSLMap(config.tallyMap);
-  // console.log("Loaded TSL map:", tslMapper.getTSLMap());
   const tslBridge = new TallyTSLBridge(tslMapper, config.tsl5Clients);
   atemController.on('tallyUpdated', (tallies) => {
     tslBridge.handleTallyUpdate(tallies);
@@ -33,28 +36,28 @@ async function startup(): Promise<AppContext> {
 
 async function shutdown(context: AppContext|null): Promise<void> {
   if (!context) {
-    console.warn("No context provided to shutdown, exiting immediately");
+    debug("No context provided to shutdown, exiting immediately");
     return;
   }
-  console.log("Sending all tallies off...");
+  debug("Sending all tallies off...");
   context.tslBridge.sendAllTalliesOff();
   // Clean up resources, close connections, etc.
-  console.log("Shutting down application...");
+  debug("Shutting down application...");
   await stopServer(context.apiServer);
   await context.atemController.disconnect();
-  console.log("Application shutdown complete");
+  debug("Application shutdown complete");
 }
 
 let appContext: AppContext|null = null;
 
 exitHook((signal) => {
-  console.log(`Exit signal received: ${signal}`);
+  debug(`Exit signal received: ${signal}`);
   shutdown(appContext)
     .then(() => {
-      console.log("Shutdown complete, exiting now.");
+      debug("Shutdown complete, exiting now.");
     })
     .catch((error) => {
-      console.error("Error during shutdown:", error);
+      debug("Error during shutdown:", error);
     });
 });
 
@@ -62,8 +65,8 @@ exitHook((signal) => {
 startup()
   .then((context) => {
     appContext = context;
-    console.log("Application started successfully");
+    debug("Application started successfully");
   })
   .catch((error) => {
-    console.error("Failed to start application:", error);
+    debug("Failed to start application:", error);
   });

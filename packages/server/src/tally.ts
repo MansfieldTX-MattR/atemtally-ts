@@ -1,4 +1,4 @@
-
+import { debug as createDebug } from "debug";
 import { EventEmitter } from "node:events";
 import type { AtemState, Atem } from "atem-connection";
 import { ExternalPortType } from "atem-connection/dist/enums";
@@ -26,6 +26,7 @@ import {
   tallyColorToValue
 } from "@atemtally/common";
 
+const debug = createDebug("atemtally:tally");
 
 type TallyWithoutName = Omit<Tally, "name">;
 
@@ -93,7 +94,7 @@ export class TallyCollection extends EventEmitter <TallyCollectionEvents> {
           name,
         };
         this.tallies.set(key, tally);
-        // console.log(`Initialized tally with key ${key}: `, tally);
+        // debug(`Initialized tally with key ${key}: `, tally);
         if (!this.tallies.has(key)) {
           throw new Error(`Tally key ${key} not found after initialization`);
         }
@@ -128,21 +129,21 @@ export class TallyCollection extends EventEmitter <TallyCollectionEvents> {
       missingKeys.delete(key);
       const existingTally = this.tallies.get(key);
       if (!this.tallies.has(key) || existingTally === undefined) {
-        // throw new Error(`Tally key ${key} not found in existing tallies`);
         continue;
       }
       if (existingTally.color !== tally.color) {
         if (existingTally.inputIndex !== tally.inputIndex || existingTally.mixEngineIndex !== tally.mixEngineIndex) {
           throw new Error(`Tally key mismatch for existing tally ${existingTally.inputIndex}, ${existingTally.mixEngineIndex} and new tally ${tally.inputIndex}, ${tally.mixEngineIndex}`);
         }
-        // console.assert(existingTally.inputIndex === tally.inputIndex && existingTally.mixEngineIndex === tally.mixEngineIndex, "Tally key mismatch");
         existingTally.color = tally.color;
         existingTally.busses = tally.busses;
         updatedTallies.push(existingTally);
       }
     }
     const updatedKeys = new Set(updatedTallies.map(tally => getTallyMEId(tally.mixEngineIndex, tally.inputIndex)));
-    console.assert(updatedKeys.size === updatedTallies.length, "Updated keys should be unique");
+    if (updatedKeys.size !== updatedTallies.length) {
+      throw new Error("Updated keys should be unique");
+    }
     for (const key of missingKeys) {
       if (updatedKeys.has(key)) {
         continue;
@@ -266,7 +267,7 @@ export class TallyTSLMapper {
       items.push(mapItem);
       // this.tallyToTSLMap.get(tallyId)!.push(mapItem);
     }
-    console.log(`Loaded TSL map with ${this.tallyToTSLMap.size} items:`, this.getTSLMap());
+    debug(`Loaded TSL map with ${this.tallyToTSLMap.size} items`);
   }
 }
 
@@ -285,9 +286,8 @@ export class TallyTSLBridge {
   handleTallyUpdate(updatedTallies: Tally[]) {
     for (const tally of updatedTallies) {
       const tallyId = getTallyMEId(tally.mixEngineIndex, tally.inputIndex);
-      // console.log(`Received tally update for ID ${tallyId}. Has id = ${this.mapper.has(tallyId)}: `, tally);
       if (this.mapper.has(tallyId)) {
-        console.log(`Tally updated for ME${tally.mixEngineIndex} input ${tally.inputIndex} with color ${tally.color}, sending to TSL`);
+        debug(`Tally updated for ME${tally.mixEngineIndex} input ${tally.inputIndex} with color ${tally.color}, sending to TSL`);
         this.sendTally(tally);
       }
     }
@@ -296,7 +296,7 @@ export class TallyTSLBridge {
   sendTally(tally: Tally) {
     const tslTally = this.mapper.buildTSLTallies(tally);
     for (const client of this.clients) {
-      // console.log(`Sending tally to client ${client.host}:${client.port}:`, tslTally);
+      // debug(`Sending tally to client ${client.host}:${client.port}:`, tslTally);
       this.tsl.sendTallyUDP(client.host, client.port, tslTally);
     }
   }
@@ -319,8 +319,8 @@ export class TallyTSLBridge {
             text: "",
           }
         };
+        debug(`Sending all off for tally ID ${tallyId} to clients`);
         for (const client of this.clients) {
-          console.log(`Sending tally off for tally ID ${tallyId} to client ${client.host}:${client.port}:`, tslTally);
           this.tsl.sendTallyUDP(client.host, client.port, tslTally);
         }
       }

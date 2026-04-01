@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "atem-connection": "^3.9.0",
+    "debug": "catalog:",
     "exit-hook": "^5.1.0",
     "express": "^5.2.1",
     "tsl-umd-v5": "catalog:"

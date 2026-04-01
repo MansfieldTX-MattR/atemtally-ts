@@ -1,3 +1,4 @@
+import { debug as createDebug } from "debug";
 import express, { type Express, type Request, type Response } from "express";
 import type { Server } from "node:http";
 import type { TallyTSLMapper, TallyTSLBridge } from "./tally";
@@ -9,6 +10,8 @@ import type {
   SendAllOffResponse,
   ErrorResponse,
 } from "@atemtally/common";
+
+const debug = createDebug("atemtally:api");
 
 interface ApiDeps {
   tslMapper: TallyTSLMapper;
@@ -67,7 +70,7 @@ export function createApp(deps: ApiDeps): Express {
 export function startServer(app: Express, port: number): Promise<Server> {
   return new Promise((resolve) => {
     const server = app.listen(port, () => {
-      console.log(`API server listening on port ${port}`);
+      debug(`API server listening on port ${port}`);
       resolve(server);
     });
   });

@@ -10,6 +10,7 @@ catalog:
   "@types/debug": "^4.1.1"
   "@types/node": "^25.5.0"
   "atem-connection": "^3.9.0"
+  debug: ^4.4.3
   "eslint": "^9.39.4"
   "exit-hook": "^5.1.0"
   "ts-node": "^10.9.2"
