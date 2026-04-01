@@ -10,12 +10,6 @@ type AtemAddress = string;
 
 
 
-interface AtemCoreEventPromises {
-  connected: Promise<void>;
-  disconnected: Promise<void>;
-  error: Promise<string>;
-  // connectionState: Promise<AtemConnectionStatus>;
-}
 
 interface AtemEvents {
   connected: [];
@@ -113,7 +107,7 @@ export class AtemController extends EventEmitter<AtemEvents> {
     return this.atem.status === AtemConnectionStatus.CONNECTED;
   }
 
-  onStateChange(state: AtemState): void {
+  onStateChange(state: AtemState): void { // eslint-disable-line @typescript-eslint/no-unused-vars
     // console.log('ATEM state changed:', state);
     this.tallyCollection.updateTallies(this.atem, 0);
   }

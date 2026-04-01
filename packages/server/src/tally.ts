@@ -1,6 +1,6 @@
 
 import { EventEmitter } from "node:events";
-import type { AtemState, Atem, Input } from "atem-connection";
+import type { AtemState, Atem } from "atem-connection";
 import { ExternalPortType } from "atem-connection/dist/enums";
 import type {
   Tally as TSL5Tally,
@@ -23,14 +23,13 @@ import type {
 import {
   TallyColor,
   getTallyMEId,
-  parseTallyMEId,
   tallyColorToValue
 } from "@atemtally/common";
 
 
-interface TallyWithoutName extends Omit<Tally, "name"> {}
+type TallyWithoutName = Omit<Tally, "name">;
 
-export function getTallyColors(atem: Atem, meIndex: MixEngineIndex, filterInputs?: TallyIndex[]): Map<TallyIndex, TallyWithoutName> {
+export function getTallyColors(atem: Atem, meIndex: MixEngineIndex): Map<TallyIndex, TallyWithoutName> {
   const tallyColors: Map<TallyIndex, TallyColor> = new Map();
   const previewInputs = new Set(atem.listVisibleInputs('preview', meIndex));
   const programInputs = new Set(atem.listVisibleInputs('program', meIndex));
@@ -112,15 +111,15 @@ export class TallyCollection extends EventEmitter <TallyCollectionEvents> {
     this.initialized = true;
   }
 
-  updateTallies(atem: Atem, meIndex: MixEngineIndex, filterInputs?: TallyIndex[]) {
+  updateTallies(atem: Atem, meIndex: MixEngineIndex) {
     if (!this.initialized) {
       return;
     }
     this._updateTallies(atem, meIndex, filterInputs);
   }
 
-  _updateTallies(atem: Atem, meIndex: MixEngineIndex, filterInputs?: TallyIndex[]) {
-    const newTallies = getTallyColors(atem, meIndex, filterInputs);
+  _updateTallies(atem: Atem, meIndex: MixEngineIndex) {
+    const newTallies = getTallyColors(atem, meIndex);
     const existingKeys = new Set(this.tallies.keys());
     const missingKeys = new Set(existingKeys);
     const updatedTallies: Tally[] = [];
