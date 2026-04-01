@@ -64,6 +64,7 @@ export class AtemController extends EventEmitter<AtemEvents> {
       debug(`Disconnected from ATEM at ${this.address}`);
       this.emit('disconnected');
       this.emit('statusChanged', this.atem.status);
+      this.tallyCollection.reset();
     });
 
     this.atem.on('error', (error) => {
@@ -85,6 +86,7 @@ export class AtemController extends EventEmitter<AtemEvents> {
   }
 
   async disconnect(): Promise<void> {
+    this.tallyCollection.reset();
     try {
       await this.atem.disconnect();
       debug(`Disconnected from ATEM at ${this.address}`);

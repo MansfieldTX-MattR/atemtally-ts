@@ -111,6 +111,18 @@ export class TallyCollection extends EventEmitter <TallyCollectionEvents> {
     this._initialized = true;
   }
 
+  reset() {
+    if (!this._initialized) {
+      return;
+    }
+    for (const tally of this.tallies.values()) {
+      tally.color = TallyColor.OFF;
+      tally.busses = [];
+    }
+    this._initialized = false;
+    this.emit('tallyUpdated', Array.from(this.tallies.values()));
+  }
+
   updateTallies(atem: Atem, meIndex: MixEngineIndex) {
     if (!this._initialized) {
       return;
