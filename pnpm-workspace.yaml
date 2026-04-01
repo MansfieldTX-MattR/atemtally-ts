@@ -1,26 +1,25 @@
 packages:
   - packages/*
 
-
-onlyBuiltDependencies:
-  - "tsl-umd-v5"
-
-ignoredBuiltDependencies:
-  - sharp
-  - unrs-resolver
-
 allowBuilds:
   '@julusian/freetype2': false
 
 catalog:
   "@eslint/js": "^9.39.4"
   "@tsconfig/node22": "^22.0.5"
-  "@types/node": "^25.5.0"
   "@types/debug": "^4.1.1"
-  "ts-node": "^10.9.2"
-  "typescript": "^6.0.2"
+  "@types/node": "^25.5.0"
   "atem-connection": "^3.9.0"
   "eslint": "^9.39.4"
   "exit-hook": "^5.1.0"
+  "ts-node": "^10.9.2"
   "tsl-umd-v5": "github:MansfieldTX-MattR/tsl-umd-v5#typescript-convert"
+  "typescript": "^6.0.2"
   "typescript-eslint": "^8.58.0"
+
+ignoredBuiltDependencies:
+  - sharp
+  - unrs-resolver
+
+onlyBuiltDependencies:
+  - "tsl-umd-v5"
