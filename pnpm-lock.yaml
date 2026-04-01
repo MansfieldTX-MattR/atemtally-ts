@@ -82,7 +82,7 @@ importers:
         version: 5.2.1
       tsl-umd-v5:
         specifier: 'catalog:'
-        version: https://codeload.github.com/MansfieldTX-MattR/tsl-umd-v5/tar.gz/0a5333ceb8e8d4c48dca81b2d894cbe61a6e05cc
+        version: https://codeload.github.com/MansfieldTX-MattR/tsl-umd-v5/tar.gz/cb9329a4a2e500e9aabe3c3cb1f8526c9e79d773
     devDependencies:
       '@atemtally/common':
         specifier: workspace:*
@@ -132,6 +132,9 @@ importers:
       react-dom:
         specifier: 19.2.4
         version: 19.2.4(react@19.2.4)
+      tsl-umd-v5:
+        specifier: 'catalog:'
+        version: https://codeload.github.com/MansfieldTX-MattR/tsl-umd-v5/tar.gz/cb9329a4a2e500e9aabe3c3cb1f8526c9e79d773
     devDependencies:
       '@eslint/js':
         specifier: 'catalog:'
@@ -2552,8 +2555,8 @@ packages:
   tsconfig-paths@3.15.0:
     resolution: {integrity: sha512-2Ac2RgzDe/cn48GvOe3M+o82pEFewD3UPbyoUHHdKasHwJKjds4fLXWf/Ux5kATBKN20oaFGu+jbElp1pos0mg==}
 
-  tsl-umd-v5@https://codeload.github.com/MansfieldTX-MattR/tsl-umd-v5/tar.gz/0a5333ceb8e8d4c48dca81b2d894cbe61a6e05cc:
-    resolution: {tarball: https://codeload.github.com/MansfieldTX-MattR/tsl-umd-v5/tar.gz/0a5333ceb8e8d4c48dca81b2d894cbe61a6e05cc}
+  tsl-umd-v5@https://codeload.github.com/MansfieldTX-MattR/tsl-umd-v5/tar.gz/cb9329a4a2e500e9aabe3c3cb1f8526c9e79d773:
+    resolution: {tarball: https://codeload.github.com/MansfieldTX-MattR/tsl-umd-v5/tar.gz/cb9329a4a2e500e9aabe3c3cb1f8526c9e79d773}
     version: 1.0.7
 
   tslib@1.14.1:
@@ -5212,7 +5215,7 @@ snapshots:
       minimist: 1.2.8
       strip-bom: 3.0.0
 
-  tsl-umd-v5@https://codeload.github.com/MansfieldTX-MattR/tsl-umd-v5/tar.gz/0a5333ceb8e8d4c48dca81b2d894cbe61a6e05cc:
+  tsl-umd-v5@https://codeload.github.com/MansfieldTX-MattR/tsl-umd-v5/tar.gz/cb9329a4a2e500e9aabe3c3cb1f8526c9e79d773:
     dependencies:
       debug: 4.4.3
     transitivePeerDependencies:
