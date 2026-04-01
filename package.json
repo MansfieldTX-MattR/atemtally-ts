@@ -8,6 +8,7 @@
     "start": "turbo run start",
     "dev": "turbo run dev",
     "typecheck": "turbo run typecheck",
+    "lint": "turbo run lint",
     "clean": "turbo run clean && pnpm clean-root",
     "clean-root": "rimraf node_modules dist .turbo tsconfig.tsbuildinfo"
   },

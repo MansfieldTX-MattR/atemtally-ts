@@ -15,6 +15,9 @@
     "typecheck": {
       "dependsOn": ["^typecheck"]
     },
+    "lint": {
+      "dependsOn": ["^lint"]
+    },
     "clean": {
       "dependsOn": ["^clean"],
       "outputs": []

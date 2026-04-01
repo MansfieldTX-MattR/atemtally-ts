@@ -8,12 +8,16 @@
     "preinstall": "npx only-allow pnpm",
     "build": "tsc",
     "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts",
     "clean": "rimraf node_modules dist .turbo tsconfig.tsbuildinfo"
   },
   "devDependencies": {
+    "@eslint/js": "catalog:",
     "@tsconfig/node22": "catalog:",
     "@types/node": "catalog:",
+    "eslint": "catalog:",
     "ts-node": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "typescript-eslint": "catalog:"
   }
 }

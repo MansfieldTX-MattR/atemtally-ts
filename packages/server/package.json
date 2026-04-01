@@ -8,6 +8,7 @@
     "start": "node dist/index.js",
     "dev": "tsx src/index.ts",
     "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts",
     "clean": "rimraf node_modules dist .turbo tsconfig.tsbuildinfo"
   },
   "dependencies": {
@@ -18,12 +19,15 @@
   },
   "devDependencies": {
     "@atemtally/common": "workspace:*",
+    "@eslint/js": "catalog:",
     "@tsconfig/node22": "catalog:",
     "@types/debug": "catalog:",
     "@types/express": "^5.0.6",
     "@types/node": "catalog:",
+    "eslint": "catalog:",
     "ts-node": "catalog:",
     "tsx": "^4.21.0",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "typescript-eslint": "catalog:"
   }
 }
