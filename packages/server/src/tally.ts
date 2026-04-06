@@ -181,9 +181,6 @@ export class TallyCollection extends EventEmitter <TallyCollectionEvents> {
   }
 }
 
-type TSL5TallyDisplayPartial = {
-  [Property in TSL5TallyType]?: TSL5TallyColor;
-}
 
 
 // export type TallyTSLMap = {
@@ -222,10 +219,14 @@ export class TallyTSLMapper {
       };
       tslDisplays.push(tallyDisplay);
     }
-    const combinedDisplay: TSL5TallyDisplayPartial = {};
+    const combinedDisplay: Record<TSL5TallyType, TSL5TallyColor> = {
+      rh_tally: 0,
+      text_tally: 0,
+      lh_tally: 0,
+    };
     for (const display of tslDisplays) {
       for (const type of ["rh_tally", "text_tally", "lh_tally"] as TSL5TallyType[]) {
-        if (display[type] && display[type]! > 0) {
+        if (display[type] && display[type] > 0) {
           combinedDisplay[type] = display[type];
         }
       }
@@ -234,9 +235,9 @@ export class TallyTSLMapper {
       screen: tslMapItems[0].screen,
       index: tslMapItems[0].index,
       display: {
-        rh_tally: combinedDisplay.rh_tally || 0,
-        text_tally: combinedDisplay.text_tally || 0,
-        lh_tally: combinedDisplay.lh_tally || 0,
+        rh_tally: combinedDisplay.rh_tally,
+        text_tally: combinedDisplay.text_tally,
+        lh_tally: combinedDisplay.lh_tally,
         brightness: 3,
         text: tally.name,
       }
