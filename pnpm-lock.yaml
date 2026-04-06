@@ -13,7 +13,7 @@ catalogs:
       specifier: ^22.0.5
       version: 22.0.5
     '@types/debug':
-      specifier: ^4.1.1
+      specifier: ^4.1.13
       version: 4.1.13
     '@types/node':
       specifier: ^25.5.0
