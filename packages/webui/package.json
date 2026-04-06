@@ -6,6 +6,8 @@
     "dev": "next dev --port 3001",
     "build": "next build",
     "start": "next start --port 3001",
+    "typecheck": "tsc --noEmit",
+    "clean": "rimraf node_modules dist .turbo tsconfig.tsbuildinfo",
     "lint": "eslint"
   },
   "dependencies": {
