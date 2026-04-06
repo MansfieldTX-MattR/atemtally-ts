@@ -312,6 +312,16 @@ export class TallyTSLBridge {
     }
   }
 
+  resendTallies(tallies: Tally[]) {
+    // debug(`Resending ${tallies.length} tallies to TSL clients`);
+    for (const tally of tallies) {
+      const tallyId = getTallyMEId(tally.mixEngineIndex, tally.inputIndex);
+      if (this.mapper.has(tallyId)) {
+        this.sendTally(tally);
+      }
+    }
+  }
+
   sendTally(tally: Tally) {
     const tslTally = this.mapper.buildTSLTallies(tally);
     for (const client of this.clients) {

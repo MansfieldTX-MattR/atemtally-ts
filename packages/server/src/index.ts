@@ -31,6 +31,9 @@ async function startup(): Promise<AppContext> {
   atemController.on('tallyUpdated', (tallies) => {
     tslBridge.handleTallyUpdate(tallies);
   });
+  atemController.on('tallyResend', (tallies) => {
+    tslBridge.resendTallies(tallies);
+  });
   tslBridge.sendAllTalliesOff(); // Ensure all tallies are off on startup
   await atemController.connect();
   debug("Starting API server...");
