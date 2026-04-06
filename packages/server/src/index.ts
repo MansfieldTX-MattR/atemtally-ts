@@ -1,6 +1,7 @@
 import { debug as createDebug } from "debug";
 import exitHook from "exit-hook";
 import type { Server } from "node:http";
+import { EnvConfigDefaults } from "@atemtally/common";
 import { AtemController } from "./atem";
 import { TallyTSLMapper, TallyTSLBridge } from "./tally";
 import { Config } from "./config";
@@ -18,7 +19,7 @@ interface AppContext {
 
 async function startup(): Promise<AppContext> {
   // const config = Config.fromJSON(process.env.CONFIG_JSON || "{}");
-  const configFilename = "../../conf.json";
+  const configFilename = process.env.ATEM_CONFIG_FILENAME || EnvConfigDefaults.ATEM_CONFIG_FILENAME;
   const config = Config.fromFile(configFilename);
   const atemController = new AtemController(config.atemAddress);
   const tslMapper = new TallyTSLMapper();

@@ -7,8 +7,10 @@ import type {
   SendAllOffResponse,
   ErrorResponse,
 } from "@atemtally/common";
+import { EnvConfigDefaults } from "@atemtally/common";
 
-const API_BASE = process.env.API_URL ?? "http://localhost:3000";
+const API_BASE = process.env.ATEM_API_BASE_URL ?? EnvConfigDefaults.ATEM_API_BASE_URL;
+
 
 export async function getTSLMap(): Promise<GetTSLMapResponse> {
   const res = await fetch(`${API_BASE}/api/tally/map`, { cache: "no-store" });

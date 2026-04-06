@@ -26,3 +26,7 @@ export interface HostPort {
   host: string;
   port: number;
 }
+
+
+export type { EnvConfig } from "./env.js";
+export * from "./env.js";
