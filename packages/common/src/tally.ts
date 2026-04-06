@@ -24,7 +24,14 @@ export enum TallyColor {
   AMBER = 1 | 2,
 }
 
-export function tallyColorToValue(color: TallyColor): TSL5TallyColor {
+export function tallyColorToValue(color: TallyColor|TSL5TallyColor): TSL5TallyColor {
+  if (typeof color === "number") {
+    if (color >= 0 && color <= 3) {
+      return color;
+    } else {
+      throw new Error(`Invalid tally color value: ${color}`);
+    }
+  }
   switch (color) {
     case TallyColor.OFF:
       return 0;

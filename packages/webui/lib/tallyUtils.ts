@@ -3,7 +3,7 @@ import type {
   TallyMEId,
   TallyTSLMapItem,
 } from "@atemtally/common";
-import { TallyColor } from "@atemtally/common";
+import { TallyColor, tallyColorToValue } from "@atemtally/common";
 
 
 export interface TallyTSLMapItemWithActive extends TallyTSLMapItem {
@@ -26,8 +26,8 @@ export function isTallyMapItemActive<T extends TSL5Tally>(item: TallyTSLMapItem,
   if (!tally || !tally.display) {
     return false;
   }
-  const tallyColor = tally.display[item.tallyType];
-  return tallyColor === item.tallyColor;
+  const tallyColor = tallyColorToValue(tally.display[item.tallyType]);
+  return tallyColor === tallyColorToValue(item.tallyColor);
 }
 
 export function mergeTSL5Tally(existing: TSL5Tally, update: TSL5Tally): [TSL5Tally, boolean] {
