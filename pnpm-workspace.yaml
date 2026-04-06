@@ -14,7 +14,7 @@ catalog:
   "eslint": "^9.39.4"
   "exit-hook": "^5.1.0"
   "ts-node": "^10.9.2"
-  "tsl-umd-v5": "github:MansfieldTX-MattR/tsl-umd-v5#typescript-convert"
+  "tsl-umd-v5": "github:MansfieldTX-MattR/tsl-umd-v5#nocarryr-develop"
   "typescript": "^6.0.2"
   "typescript-eslint": "^8.58.0"
 
