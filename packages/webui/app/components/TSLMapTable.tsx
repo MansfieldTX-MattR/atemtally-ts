@@ -1,10 +1,10 @@
 "use client";
 
-import type { GetTSLMapResponse } from "@atemtally/common";
 import { TallyColor } from "@atemtally/common";
+import type { TallyTSLMapItemWithActive, TallyTSLMapWithActive } from "../../lib/tallyUtils";
 
 interface TSLMapTableProps {
-  tslMap: GetTSLMapResponse;
+  tslMap: TallyTSLMapWithActive;
   loading: boolean;
   onRefresh: () => void;
 }
@@ -49,16 +49,7 @@ export default function TSLMapTable({ tslMap, loading, onRefresh }: TSLMapTableP
             </thead>
             <tbody>
               {Object.entries(tslMap).flatMap(([tallyId, items]) =>
-                items.map((item, i) => (
-                  <tr key={`${tallyId}-${i}`} className="border-b border-zinc-100 dark:border-zinc-800">
-                    <td className="py-2 pr-4 font-mono">{item.tallyId}</td>
-                    <td className="py-2 pr-4">{item.bus}</td>
-                    <td className="py-2 pr-4">{item.screen}</td>
-                    <td className="py-2 pr-4">{item.index}</td>
-                    <td className="py-2 pr-4">{item.tallyType}</td>
-                    <td className="py-2">{tallyColorLabel(item.tallyColor)}</td>
-                  </tr>
-                ))
+                items.map((item, i) => <TallyMapItemRow key={`${tallyId}-${i}`} item={item} />)
               )}
             </tbody>
           </table>
@@ -67,3 +58,25 @@ export default function TSLMapTable({ tslMap, loading, onRefresh }: TSLMapTableP
     </section>
   );
 }
+
+const TallyMapItemRow = ({ item }: { item: TallyTSLMapItemWithActive }) => {
+  function getBgColor() {
+    if (!item.active) return "";
+    switch (item.tallyColor) {
+      case TallyColor.RED: return "bg-red-100 dark:bg-red-800";
+      case TallyColor.GREEN: return "bg-green-100 dark:bg-green-800";
+      case TallyColor.AMBER: return "bg-yellow-100 dark:bg-yellow-800";
+      default: return "";
+    }
+  }
+  return (
+    <tr className={`border-b border-zinc-100 dark:border-zinc-800 ${getBgColor()}`}>
+      <td className="py-2 pr-4 font-mono">{item.tallyId}</td>
+      <td className="py-2 pr-4">{item.bus}</td>
+      <td className="py-2 pr-4">{item.screen}</td>
+      <td className="py-2 pr-4">{item.index}</td>
+      <td className="py-2 pr-4">{item.tallyType}</td>
+      <td className="py-2">{tallyColorLabel(item.tallyColor)}</td>
+    </tr>
+  );
+};
