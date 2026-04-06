@@ -24,9 +24,8 @@ async function startup(): Promise<AppContext> {
   const configFilename = process.env.ATEM_CONFIG_FILENAME || EnvConfigDefaults.ATEM_CONFIG_FILENAME;
   const config = Config.fromFile(configFilename);
   const atemController = new AtemController(config.atemAddress);
-  const tslMapper = new TallyTSLMapper();
-  tslMapper.loadTSLMap(config.tallyMap);
-  const tslBridge = new TallyTSLBridge(tslMapper, config.tsl5Clients);
+  const tslMapper = new TallyTSLMapper(config);
+  const tslBridge = new TallyTSLBridge(tslMapper, config.tsl5Clients, config);
   tslBridge.addClient({ host: NEXTJS_TSL_HOST, port: NEXTJS_TSL_PORT });
   atemController.on('tallyUpdated', (tallies) => {
     tslBridge.handleTallyUpdate(tallies);

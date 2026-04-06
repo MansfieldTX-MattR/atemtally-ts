@@ -25,6 +25,7 @@ import {
   getTallyMEId,
   tallyColorToValue
 } from "@atemtally/common";
+import type { Config } from "./config";
 
 const debug = createDebug("atemtally:tally");
 
@@ -189,9 +190,14 @@ export class TallyCollection extends EventEmitter <TallyCollectionEvents> {
 
 export class TallyTSLMapper {
   private tallyToTSLMap: Map<TallyMEId, TallyTSLMapItem[]>;
+  private config: Config | null;
 
-  constructor() {
+  constructor(config: Config | null = null) {
     this.tallyToTSLMap = new Map();
+    this.config = config;
+    if (config) {
+      this.loadTSLMap(config.tallyMap);
+    }
   }
 
   get(tallyId: TallyMEId): TallyTSLMapItem[] | undefined {
@@ -264,6 +270,10 @@ export class TallyTSLMapper {
       this.tallyToTSLMap.set(tallyId, items);
     }
     items.push(tslMapItem);
+    if (this.config && this.config.hasConfigFile) {
+      this.config.tallyMap = Array.from(this.tallyToTSLMap.values()).flat();
+      this.config.save();
+    }
     return tslMapItem;
   }
 
@@ -293,11 +303,18 @@ export class TallyTSLBridge {
   private mapper: TallyTSLMapper;
   private tsl: TSL5;
   private clients: Set<HostPort>;
+  private config: Config | null;
 
-  constructor(mapper: TallyTSLMapper, clients?: HostPort[]) {
+  constructor(mapper: TallyTSLMapper, clients?: HostPort[], config: Config | null = null) {
     this.mapper = mapper;
     this.tsl = new TSL5();
     this.clients = new Set(clients);
+    this.config = config;
+    if (this.config) {
+      for (const client of this.config.tsl5Clients) {
+        this.clients.add(client);
+      }
+    }
   }
 
   addClient(client: HostPort) {
