@@ -294,6 +294,14 @@ export class TallyTSLBridge {
     this.clients = new Set(clients);
   }
 
+  addClient(client: HostPort) {
+    this.clients.add(client);
+  }
+
+  removeClient(client: HostPort) {
+    this.clients.delete(client);
+  }
+
   handleTallyUpdate(updatedTallies: Tally[]) {
     for (const tally of updatedTallies) {
       const tallyId = getTallyMEId(tally.mixEngineIndex, tally.inputIndex);
