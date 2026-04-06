@@ -7,6 +7,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "build": "tsc",
+    "dev": "tsc",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext .ts",
     "clean": "rimraf node_modules dist .turbo tsconfig.tsbuildinfo"
