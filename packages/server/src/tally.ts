@@ -258,7 +258,12 @@ export class TallyTSLMapper {
       tallyType,
       tallyColor: color,
     };
-    this.tallyToTSLMap.set(tallyId, [tslMapItem]);
+    let items = this.tallyToTSLMap.get(tallyId);
+    if (!items) {
+      items = [];
+      this.tallyToTSLMap.set(tallyId, items);
+    }
+    items.push(tslMapItem);
     return tslMapItem;
   }
 
