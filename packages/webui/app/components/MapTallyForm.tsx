@@ -41,7 +41,7 @@ export default function MapTallyForm({ loading, onSubmit }: MapTallyFormProps) {
   return (
     <section>
       <h2 className="text-xl font-semibold mb-4">Map Tally to TSL</h2>
-      <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4 max-w-lg">
+      <form onSubmit={(e) => { handleSubmit(e).catch(console.error); }} className="grid grid-cols-2 gap-4 max-w-lg">
         <NumberField
           label="Input Index"
           value={inputIndex}

@@ -6,7 +6,7 @@ import type { TallyTSLMapItemWithActive, TallyTSLMapWithActive } from "../../lib
 interface TSLMapTableProps {
   tslMap: TallyTSLMapWithActive;
   loading: boolean;
-  onRefresh: () => void;
+  onRefresh: () => Promise<void>;
 }
 
 function tallyColorLabel(c: TallyColor) {
@@ -25,7 +25,7 @@ export default function TSLMapTable({ tslMap, loading, onRefresh }: TSLMapTableP
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-semibold">TSL Map</h2>
         <button
-          onClick={onRefresh}
+          onClick={() => { onRefresh().catch(console.error); }}
           disabled={loading}
           className="rounded bg-zinc-200 px-3 py-1.5 text-sm font-medium hover:bg-zinc-300 disabled:opacity-50 dark:bg-zinc-700 dark:hover:bg-zinc-600"
         >

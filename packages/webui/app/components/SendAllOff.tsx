@@ -2,7 +2,7 @@
 
 interface SendAllOffProps {
   loading: boolean;
-  onSendAllOff: () => void;
+  onSendAllOff: () => Promise<void>;
 }
 
 export default function SendAllOff({ loading, onSendAllOff }: SendAllOffProps) {
@@ -10,7 +10,7 @@ export default function SendAllOff({ loading, onSendAllOff }: SendAllOffProps) {
     <section>
       <h2 className="text-xl font-semibold mb-4">Send All Tallies Off</h2>
       <button
-        onClick={onSendAllOff}
+        onClick={() => { onSendAllOff().catch(console.error); }}
         disabled={loading}
         className="rounded bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
       >

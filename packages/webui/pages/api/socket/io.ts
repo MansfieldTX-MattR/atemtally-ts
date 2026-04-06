@@ -22,7 +22,7 @@ function createInstance<T>(cls: Constructor<T>, ...args: object[]): T {
   return new cls(...args);
 }
 
-const ioHandler = async (req: NextApiRequest, res: NextApiResponseServerIo) => {
+const ioHandler = (req: NextApiRequest, res: NextApiResponseServerIo) => {
   if (!res.socket.server.io) {
     debug("Initializing Socket.IO server...");
     const tallyListener = new TallyListener();

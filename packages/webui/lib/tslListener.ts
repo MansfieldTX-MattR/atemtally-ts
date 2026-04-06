@@ -25,7 +25,7 @@ export class TallyListener extends EventEmitter<TallyListenerEvents> {
     super();
     this.tslInstance = new TSL5();
     this._allTallies = new Map();
-    this.tslInstance.on("message", async (msg: TSL5TallyMessage) => {
+    this.tslInstance.on("message", (msg: TSL5TallyMessage) => {
       debug("Received TSL5 message: ");
       this.emit("tallyMessage", msg);
       const { screen, index } = msg;
