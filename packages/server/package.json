@@ -16,6 +16,7 @@
     "debug": "catalog:",
     "exit-hook": "^5.1.0",
     "express": "^5.2.1",
+    "socket.io": "catalog:",
     "tsl-umd-v5": "catalog:"
   },
   "devDependencies": {

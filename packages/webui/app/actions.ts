@@ -8,9 +8,8 @@ import type {
   SendAllOffResponse,
   ErrorResponse,
 } from "@atemtally/common";
-import { EnvConfigDefaults } from "@atemtally/common";
+import { API_BASE_URL as API_BASE, WEBSOCKET_URI } from "@/lib/confVars";
 
-const API_BASE = process.env.ATEM_API_BASE_URL ?? EnvConfigDefaults.ATEM_API_BASE_URL;
 
 
 export async function getTSLMap(): Promise<GetTSLMapResponse> {
@@ -34,4 +33,9 @@ export async function mapTallyToTSL(
 export async function sendAllTalliesOff(): Promise<SendAllOffResponse | ErrorResponse> {
   const res = await axios.post<SendAllOffResponse>(`${API_BASE}/api/tally/off`);
   return res.data;
+}
+
+
+export async function getWebsocketUri(): Promise<{ websocketUri: string }> { // eslint-disable-line @typescript-eslint/require-await
+  return { websocketUri: WEBSOCKET_URI };
 }

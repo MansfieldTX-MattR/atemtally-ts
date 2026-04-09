@@ -13,6 +13,8 @@ catalog:
   debug: ^4.4.3
   "eslint": "^9.39.4"
   "exit-hook": "^5.1.0"
+  socket.io: ^4.8.3
+  socket.io-client: ^4.8.3
   "ts-node": "^10.9.2"
   "tsl-umd-v5": "github:MansfieldTX-MattR/tsl-umd-v5#nocarryr-develop"
   "typescript": "^6.0.2"

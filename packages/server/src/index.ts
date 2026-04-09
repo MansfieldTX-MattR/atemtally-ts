@@ -10,8 +10,6 @@ import { createApp, startServer, stopServer } from "./api";
 const debug = createDebug("atemtally:index");
 createDebug.enable("atemtally:*");
 
-const NEXTJS_TSL_HOST = process.env.NEXTJS_TSL_HOST || EnvConfigDefaults.NEXTJS_TSL_HOST;
-const NEXTJS_TSL_PORT = process.env.NEXTJS_TSL_PORT ? Number(process.env.NEXTJS_TSL_PORT) : EnvConfigDefaults.NEXTJS_TSL_PORT;
 
 interface AppContext {
   atemController: AtemController;
@@ -26,7 +24,6 @@ async function startup(): Promise<AppContext> {
   const atemController = new AtemController(config.atemAddress);
   const tslMapper = new TallyTSLMapper(config);
   const tslBridge = new TallyTSLBridge(tslMapper, config.tsl5Clients, config);
-  tslBridge.addClient({ host: NEXTJS_TSL_HOST, port: NEXTJS_TSL_PORT });
   atemController.on('tallyUpdated', (tallies) => {
     tslBridge.handleTallyUpdate(tallies);
   });

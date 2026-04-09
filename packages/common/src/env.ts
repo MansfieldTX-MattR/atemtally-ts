@@ -8,22 +8,19 @@
 // export namespace Common.Env {
 
 export interface EnvConfig {
-  NEXTJS_TSL_HOST: string;
-  NEXTJS_TSL_PORT: number;
+  NEXTJS_PUBLIC_WEBSOCKET_URI: string;
   ATEM_CONFIG_FILENAME: string;
   ATEM_API_BASE_URL: string;
 }
 
 export const EnvConfigTypes = {
-  NEXTJS_TSL_HOST: "string",
-  NEXTJS_TSL_PORT: "number",
+  NEXTJS_PUBLIC_WEBSOCKET_URI: "string",
   ATEM_CONFIG_FILENAME: "string",
   ATEM_API_BASE_URL: "string",
 } as const;
 
 export const EnvConfigDefaults: EnvConfig = {
-  NEXTJS_TSL_HOST: "localhost",
-  NEXTJS_TSL_PORT: 62002,
+  NEXTJS_PUBLIC_WEBSOCKET_URI: "http://localhost:3000",
   ATEM_CONFIG_FILENAME: "../../conf.json",
   ATEM_API_BASE_URL: "http://localhost:3000",
 };

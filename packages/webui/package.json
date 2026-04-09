@@ -17,14 +17,13 @@
     "next": "16.2.1",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "socket.io": "^4.8.3",
-    "socket.io-client": "^4.8.3",
+    "socket.io": "catalog:",
+    "socket.io-client": "catalog:",
     "tsl-umd-v5": "catalog:"
   },
   "devDependencies": {
     "@eslint/js": "catalog:",
     "@tailwindcss/postcss": "^4",
-    "@types/axios": "^0.14.4",
     "@types/debug": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "^19",

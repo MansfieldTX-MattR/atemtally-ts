@@ -23,6 +23,23 @@ export type {
   ErrorResponse,
 } from "./api.js";
 
+export type {
+  ServerToClientEvents,
+  ClientToServerEvents,
+  InterServerEvents,
+  SocketData,
+  ListenEvents,
+  EmitEvents,
+  ServerSideEvents,
+  SocketIOServerConstructor,
+  SocketIOServerType,
+  SocketType,
+  ClientSocketConstructor,
+  ClientSocketType,
+} from "./socketio.js";
+
+export * from "./socketio.js";
+
 export * from "./api.js";
 
 

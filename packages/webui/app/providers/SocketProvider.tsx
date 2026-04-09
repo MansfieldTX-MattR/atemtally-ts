@@ -2,7 +2,7 @@
 
 import { useState, useEffect, createContext, useContext } from "react";
 
-import type { ClientSocketType, ServerToClientEvents } from "@/lib/wstypes";
+import type { ClientSocketType, ServerToClientEvents } from "@atemtally/common"
 import getSocket from "./io";
 
 
@@ -14,14 +14,17 @@ interface SocketContextType {
 const SocketContext = createContext<SocketContextType | null>(null);
 
 
-export default function SocketProvider({ children }: { children: React.ReactNode }) {
-  const socket = getSocket();
+export default function SocketProvider({socketUri, children }: { socketUri: string, children: React.ReactNode }) {
+  const socket = getSocket(socketUri);
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
-    if (socket === null) {
-      return;
+    if (socket.connected) {
+      console.log("Socket already connected");
+      socket.disconnect();
+      socket.connect();
     }
+    console.log("Setting up socket connection listeners");
     const handleConnect = () => {
       console.log("Socket connected");
       setConnected(true);
@@ -31,14 +34,19 @@ export default function SocketProvider({ children }: { children: React.ReactNode
       console.log("Socket disconnected");
       setConnected(false);
     };
+    const handleError = (error: Error) => {
+      console.error("Socket error: ", error);
+    }
     socket.on("connect", handleConnect);
     socket.on("disconnect", handleDisconnect);
+    socket.on("connect_error", handleError);
     return () => {
       socket.off("connect", handleConnect);
       socket.off("disconnect", handleDisconnect);
+      socket.off("connect_error", handleError);
       socket.disconnect();
     };
-  }, [setConnected]);
+  }, [socketUri, socket, setConnected]);
 
   return (
     <SocketContext.Provider value={{ socket, isConnected: connected }}>
@@ -55,18 +63,15 @@ export function useSocket() {
   return context;
 }
 
-
-export function useTallyMessageListener(handler: ServerToClientEvents["tallyMessage"]) {
+export function useMapItemsActiveState(handler: ServerToClientEvents["mapItemsActiveChanged"]) {
   const { socket, isConnected } = useSocket();
 
   useEffect(() => {
-    if (!isConnected) return;
-    // console.log(`Setting up socket listener for tally messages. isConnected: ${isConnected}`);
-    socket.on("tallyMessage", handler);
+    if (!isConnected || !socket) return;
+    socket.on("mapItemsActiveChanged", handler);
 
     return () => {
-      // console.log("Cleaning up socket listener for tally messages");
-      socket.off("tallyMessage", handler);
+      socket.off("mapItemsActiveChanged", handler);
     };
   }, [socket, isConnected, handler]);
 }
