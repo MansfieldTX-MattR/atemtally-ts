@@ -7,7 +7,10 @@ export type {
   TallyBus,
   TallyTSLMapItemNoId,
   TallyTSLMapItem,
+  TallyTSLMapItemWithActive,
   TallyTSLMap,
+  TallyTSLMapWithActive,
+  TallyTSLMapActiveState,
 } from "./tally.js";
 
 export * from "./tally.js";

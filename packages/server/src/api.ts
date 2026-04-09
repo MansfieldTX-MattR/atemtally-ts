@@ -54,7 +54,10 @@ export function createApp(deps: ApiDeps): Express {
     const tslMap = deps.tslMapper.getTSLMap();
     const mapObj: GetTSLMapResponse = {};
     for (const [key, value] of tslMap.entries()) {
-      mapObj[key] = value;
+      mapObj[key] = value.map((item) => ({
+        ...item,
+        active: deps.tslMapper.getItemActive(item.id),
+      }));
     }
     res.json(mapObj);
   });

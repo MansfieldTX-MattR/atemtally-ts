@@ -71,6 +71,12 @@ export interface TallyTSLMapItem extends TallyTSLMapItemNoId {
   id: string;
 }
 
+export interface TallyTSLMapItemWithActive extends TallyTSLMapItem {
+  active: boolean;
+}
+
+export type TallyTSLMapActiveState = Record<string, boolean>;
+
 export function generateTSLMapItemId(item: TallyTSLMapItemNoId|TallyTSLMapItem): string {
   return hash([
     item.tallyId,
@@ -94,3 +100,4 @@ export function createTSLMapItem(item: TallyTSLMapItemNoId): TallyTSLMapItem {
 }
 
 export type TallyTSLMap = TallyTSLMapItem[];
+export type TallyTSLMapWithActive = Record<TallyMEId, TallyTSLMapItemWithActive[]>;

@@ -1,7 +1,7 @@
 "use client";
 
 import { TallyColor } from "@atemtally/common";
-import type { TallyTSLMapItemWithActive, TallyTSLMapWithActive } from "../../lib/tallyUtils";
+import type { TallyTSLMapItemWithActive, TallyTSLMapWithActive } from "@atemtally/common";
 
 interface TSLMapTableProps {
   tslMap: TallyTSLMapWithActive;

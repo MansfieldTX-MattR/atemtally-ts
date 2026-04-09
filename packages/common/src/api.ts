@@ -6,6 +6,7 @@ import type {
   TallyColor,
   TallyTSLMapItem,
   TSL5TallyType,
+  TallyTSLMapItemWithActive,
 } from "./tally.js";
 
 export interface MapTallyRequestBody {
@@ -20,7 +21,7 @@ export interface MapTallyRequestBody {
 
 export type MapTallyResponse = TallyTSLMapItem;
 
-export type GetTSLMapResponse = Record<TallyMEId, TallyTSLMapItem[]>;
+export type GetTSLMapResponse = Record<TallyMEId, TallyTSLMapItemWithActive[]>;
 
 export interface SendAllOffResponse {
   ok: boolean;

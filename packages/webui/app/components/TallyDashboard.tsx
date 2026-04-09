@@ -50,15 +50,7 @@ function getAllTalliesArray(tallies: TallyMap<TSL5Tally>): TSL5Tally[] {
 
 
 export default function TallyDashboard({ initialMap }: TallyDashboardProps) {
-  const [tslMap, setTslMap] = useState<TallyTSLMapWithActive>(Object.fromEntries(
-    Object.entries(initialMap).map(([screen, items]) => [
-      screen,
-      items.map((item) => ({
-        ...item,
-        active: isTallyMapItemActive(item, new Map()), // Initially set all to inactive; will be updated on first socket update or manual refresh
-      })),
-    ] as [string, TallyTSLMapItemWithActive[]])
-  ));
+  const [tslMap, setTslMap] = useState<TallyTSLMapWithActive>(initialMap);
   const [allTallies, setAllTallies] = useState<TallyMap<TSL5Tally>>(new Map());
   const [status, setStatus] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);

@@ -18,7 +18,7 @@ import type {
   TallyBus,
   TallyTSLMapItemNoId,
   TallyTSLMapItem,
-  TallyTSLMap,
+  TallyTSLMapActiveState,
   HostPort,
 } from "@atemtally/common";
 import {
@@ -190,14 +190,24 @@ export class TallyCollection extends EventEmitter <TallyCollectionEvents> {
 //   [tallyId: TallyMEId]: TallyTSLMapItem;
 // }
 
-export class TallyTSLMapper {
+
+
+interface TallyTSLMapperEvents {
+  mappingUpdated: [tallyId: TallyMEId, tslMapItems: TallyTSLMapItem[]];
+  mapItemsActiveChanged: [TallyTSLMapActiveState];
+}
+
+export class TallyTSLMapper extends EventEmitter<TallyTSLMapperEvents> {
   private tallyToTSLMap: Map<TallyMEId, TallyTSLMapItem[]>;
   private tallyToTSLMapById: Record<string, TallyTSLMapItem>;
+  private tslMapItemsActive: TallyTSLMapActiveState;
   private config: Config | null;
 
   constructor(config: Config | null = null) {
+    super();
     this.tallyToTSLMap = new Map();
     this.tallyToTSLMapById = {};
+    this.tslMapItemsActive = {};
     this.config = config;
     if (config) {
       this.loadTSLMap(config.tallyMap);
@@ -210,6 +220,26 @@ export class TallyTSLMapper {
 
   getById(id: string): TallyTSLMapItem | undefined {
     return this.tallyToTSLMapById[id];
+  }
+
+  getItemActive(id: string): boolean {
+    return this.tslMapItemsActive[id] || false;
+  }
+
+  private setItemsActive(activeStates: TallyTSLMapActiveState) {
+    let anyStateChanged = false;
+    for (const id in activeStates) {
+      const newState = activeStates[id];
+      const currentState = this.getItemActive(id);
+      if (currentState !== newState) {
+        this.tslMapItemsActive[id] = newState;
+        anyStateChanged = true;
+      }
+    }
+    // debug("Set TSL map items active states: ", this.tslMapItemsActive);
+    if (anyStateChanged) {
+      this.emit("mapItemsActiveChanged", this.tslMapItemsActive);
+    }
   }
 
   has(tallyId: TallyMEId): boolean {
@@ -227,6 +257,7 @@ export class TallyTSLMapper {
       throw new Error(`No TSL mapping found for tally with ID ${tallyId}`);
     }
     const tslDisplays: TSL5TallyDisplay[] = [];
+    const activeIds: TallyTSLMapActiveState = {};
     for (const tslMapItem of tslMapItems) {
       const tallyOn = tally.busses.includes(tslMapItem.bus);
       const tallyColor = tallyOn ? tslMapItem.tallyColor : TallyColor.OFF;
@@ -235,6 +266,7 @@ export class TallyTSLMapper {
         text_tally: tslMapItem.tallyType === "text_tally" ? tallyColorToValue(tallyColor) : 0,
         lh_tally: tslMapItem.tallyType === "lh_tally" ? tallyColorToValue(tallyColor) : 0,
       };
+      activeIds[tslMapItem.id] = tallyOn;
       tslDisplays.push(tallyDisplay);
     }
     const combinedDisplay: Record<TSL5TallyType, TSL5TallyColor> = {
@@ -249,6 +281,7 @@ export class TallyTSLMapper {
         }
       }
     }
+    this.setItemsActive(activeIds);
     return {
       screen: tslMapItems[0].screen,
       index: tslMapItems[0].index,
@@ -259,7 +292,7 @@ export class TallyTSLMapper {
         brightness: 3,
         text: tally.name,
       }
-    }
+    };
   }
 
   mapTallyToTSL(tally: Tally, bus: TallyBus, tallyType?: TSL5TallyType): TallyTSLMapItem {
@@ -287,6 +320,7 @@ export class TallyTSLMapper {
     }
     items.push(tslMapItemWithId);
     this.tallyToTSLMapById[tslMapItemWithId.id] = tslMapItemWithId;
+    this.tslMapItemsActive[tslMapItemWithId.id] = false;
     if (this.config && this.config.hasConfigFile) {
       this.config.tallyMap = Array.from(this.tallyToTSLMap.values()).flat();
       this.config.save();
@@ -314,6 +348,7 @@ export class TallyTSLMapper {
       }
       items.push(mapItemWithId);
       this.tallyToTSLMapById[mapItemWithId.id] = mapItemWithId;
+      this.tslMapItemsActive[mapItemWithId.id] = false;
     }
     debug(`Loaded TSL map with ${this.tallyToTSLMap.size} items`);
   }
