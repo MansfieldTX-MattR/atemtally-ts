@@ -9,6 +9,8 @@ import type {
   TallyTSLMapActiveState,
   MapTallyRequestBody,
   MapTallyResponse,
+  UnmapTallyRequestParams,
+  UnmapTallyResponse,
   GetTSLMapResponse,
   SendAllOffResponse,
   ErrorResponse,
@@ -94,6 +96,20 @@ export function createApp(deps: ApiDeps): HTTPServer {
       }));
     }
     res.json(mapObj);
+  });
+
+  app.delete("/api/tally/map/:id", (req: ApiRequest<null, UnmapTallyResponse, UnmapTallyRequestParams>, res: ApiResponse<UnmapTallyResponse>) => {
+    const { id } = req.params;
+    if (!id) {
+      res.status(400).json({ error: "Missing required parameter: id" });
+      return;
+    }
+    const result = deps.tslMapper.unmapTallyFromTSL(id);
+    if (!result) {
+      res.status(404).json({ error: "Tally mapping not found" });
+      return;
+    }
+    res.json({ ok: true });
   });
 
   app.post("/api/tally/off", (_req: Request, res: ApiResponse<SendAllOffResponse>) => {

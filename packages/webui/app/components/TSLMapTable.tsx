@@ -1,7 +1,8 @@
 "use client";
-
+import { useState } from "react";
 import { TallyColor } from "@atemtally/common";
 import type { TallyTSLMapItemWithActive, TallyTSLMapWithActive } from "@atemtally/common";
+import { unmapTallyFromTSL } from "../actions";
 
 interface TSLMapTableProps {
   tslMap: TallyTSLMapWithActive;
@@ -45,11 +46,12 @@ export default function TSLMapTable({ tslMap, loading, onRefresh }: TSLMapTableP
                 <th className="py-2 pr-4">Index</th>
                 <th className="py-2 pr-4">Tally Type</th>
                 <th className="py-2">Color</th>
+                <th className="py-2"></th>
               </tr>
             </thead>
             <tbody>
               {Object.entries(tslMap).flatMap(([tallyId, items]) =>
-                items.map((item, i) => <TallyMapItemRow key={`${tallyId}-${i}`} item={item} />)
+                items.map((item, i) => <TallyMapItemRow key={`${tallyId}-${i}`} item={item} onRefresh={onRefresh} />)
               )}
             </tbody>
           </table>
@@ -59,7 +61,7 @@ export default function TSLMapTable({ tslMap, loading, onRefresh }: TSLMapTableP
   );
 }
 
-const TallyMapItemRow = ({ item }: { item: TallyTSLMapItemWithActive }) => {
+const TallyMapItemRow = ({ item, onRefresh }: { item: TallyTSLMapItemWithActive, onRefresh: () => Promise<void> }) => {
   function getBgColor() {
     if (!item.active) return "";
     switch (item.tallyColor) {
@@ -77,6 +79,60 @@ const TallyMapItemRow = ({ item }: { item: TallyTSLMapItemWithActive }) => {
       <td className="py-2 pr-4">{item.index}</td>
       <td className="py-2 pr-4">{item.tallyType}</td>
       <td className="py-2">{tallyColorLabel(item.tallyColor)}</td>
+      <td className="py-2 text-right"><UnmapButton item={item} onRefresh={onRefresh} /></td>
     </tr>
+  );
+};
+
+const UnmapButton = ({ item, onRefresh }: { item: TallyTSLMapItemWithActive, onRefresh: () => Promise<void> }) => {
+  const [loading, setLoading] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  const handleClick = () => {
+    setShowConfirm(true);
+  };
+  const handleConfirm = async () => {
+    setLoading(true);
+    try {
+      await unmapTallyFromTSL(item.id);
+      await onRefresh();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={handleClick}
+        disabled={loading}
+        className="rounded bg-zinc-200 px-3 py-1.5 me-1.5 text-sm font-medium hover:bg-zinc-300 disabled:opacity-50 dark:bg-zinc-700 dark:hover:bg-zinc-600"
+      >
+        Unmap
+      </button>
+      {showConfirm && <ConfirmUnmapModal onConfirm={handleConfirm} onCancel={() => setShowConfirm(false)} />}
+    </>
+  );
+};
+
+const ConfirmUnmapModal = ({ onConfirm, onCancel }: { onConfirm: () => void, onCancel: () => void }) => {
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-white dark:bg-zinc-800 rounded p-6 w-full max-w-sm">
+        <h3 className="text-lg font-medium mb-4">Confirm Unmap</h3>
+        <p className="mb-6">Are you sure you want to unmap this tally?</p>
+        <div className="flex justify-end gap-2">
+          <button onClick={onCancel} className="rounded bg-zinc-200 px-3 py-1.5 text-sm font-medium hover:bg-zinc-300 dark:bg-zinc-700 dark:hover:bg-zinc-600">
+            Cancel
+          </button>
+          <button onClick={onConfirm} className="rounded bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700">
+            Unmap
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };

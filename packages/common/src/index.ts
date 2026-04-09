@@ -20,6 +20,8 @@ export type {
   MapTallyResponse,
   GetTSLMapResponse,
   SendAllOffResponse,
+  UnmapTallyRequestParams,
+  UnmapTallyResponse,
   ErrorResponse,
 } from "./api.js";
 

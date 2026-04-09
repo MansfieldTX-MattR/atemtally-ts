@@ -4,6 +4,7 @@ import axios from "axios";
 import type {
   MapTallyRequestBody,
   MapTallyResponse,
+  UnmapTallyResponse,
   GetTSLMapResponse,
   SendAllOffResponse,
   ErrorResponse,
@@ -27,6 +28,11 @@ export async function mapTallyToTSL(
   body: MapTallyRequestBody
 ): Promise<MapTallyResponse | ErrorResponse> {
   const res = await axios.post<MapTallyResponse>(`${API_BASE}/api/tally/map`, body);
+  return res.data;
+}
+
+export async function unmapTallyFromTSL(id: string): Promise<UnmapTallyResponse | ErrorResponse> {
+  const res = await axios.delete<UnmapTallyResponse>(`${API_BASE}/api/tally/map/${id}`);
   return res.data;
 }
 

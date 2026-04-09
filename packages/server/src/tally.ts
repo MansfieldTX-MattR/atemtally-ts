@@ -329,6 +329,30 @@ export class TallyTSLMapper extends EventEmitter<TallyTSLMapperEvents> {
     return tslMapItemWithId;
   }
 
+  unmapTallyFromTSL(id: string): boolean {
+    const mapItem = this.tallyToTSLMapById[id];
+    if (!mapItem) {
+      return false;
+    }
+    const { tallyId } = mapItem;
+    const items = this.tallyToTSLMap.get(tallyId);
+    if (!items) {
+      return false;
+    }
+    const index = items.findIndex(item => item.id === id);
+    if (index === -1) {
+      return false;
+    }
+    items.splice(index, 1);
+    delete this.tallyToTSLMapById[id];
+    delete this.tslMapItemsActive[id];
+    if (this.config && this.config.hasConfigFile) {
+      this.config.tallyMap = Array.from(this.tallyToTSLMap.values()).flat();
+      this.config.save();
+    }
+    return true;
+  }
+
   getTSLMap(): Map<TallyMEId, TallyTSLMapItem[]> {
     return this.tallyToTSLMap;
   }

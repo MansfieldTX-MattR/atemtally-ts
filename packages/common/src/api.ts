@@ -21,6 +21,12 @@ export interface MapTallyRequestBody {
 
 export type MapTallyResponse = TallyTSLMapItem;
 
+export interface UnmapTallyRequestParams {
+  id: string;
+}
+
+export type UnmapTallyResponse = { ok: boolean };
+
 export type GetTSLMapResponse = Record<TallyMEId, TallyTSLMapItemWithActive[]>;
 
 export interface SendAllOffResponse {
