@@ -16,11 +16,13 @@ import type {
   MixEngineIndex,
   TallyMEId,
   TallyBus,
+  TallyTSLMapItemNoId,
   TallyTSLMapItem,
   TallyTSLMap,
   HostPort,
 } from "@atemtally/common";
 import {
+  createTSLMapItem,
   TallyColor,
   getTallyMEId,
   tallyColorToValue
@@ -190,10 +192,12 @@ export class TallyCollection extends EventEmitter <TallyCollectionEvents> {
 
 export class TallyTSLMapper {
   private tallyToTSLMap: Map<TallyMEId, TallyTSLMapItem[]>;
+  private tallyToTSLMapById: Record<string, TallyTSLMapItem>;
   private config: Config | null;
 
   constructor(config: Config | null = null) {
     this.tallyToTSLMap = new Map();
+    this.tallyToTSLMapById = {};
     this.config = config;
     if (config) {
       this.loadTSLMap(config.tallyMap);
@@ -204,8 +208,16 @@ export class TallyTSLMapper {
     return this.tallyToTSLMap.get(tallyId);
   }
 
+  getById(id: string): TallyTSLMapItem | undefined {
+    return this.tallyToTSLMapById[id];
+  }
+
   has(tallyId: TallyMEId): boolean {
     return this.tallyToTSLMap.has(tallyId);
+  }
+
+  hasId(id: string): boolean {
+    return id in this.tallyToTSLMapById;
   }
 
   buildTSLTallies(tally: Tally): TSL5Tally {
@@ -256,7 +268,7 @@ export class TallyTSLMapper {
     if (tallyType === undefined) {
       tallyType = bus === "program" ? "rh_tally" : "lh_tally";
     }
-    const tslMapItem: TallyTSLMapItem = {
+    const tslMapItem: TallyTSLMapItemNoId = {
       tallyId,
       bus,
       screen: mixEngineIndex,
@@ -269,19 +281,24 @@ export class TallyTSLMapper {
       items = [];
       this.tallyToTSLMap.set(tallyId, items);
     }
-    items.push(tslMapItem);
+    const tslMapItemWithId = createTSLMapItem(tslMapItem);
+    if (this.tallyToTSLMapById[tslMapItemWithId.id]) {
+      throw new Error(`TSL map item with ID ${tslMapItemWithId.id} already exists`);
+    }
+    items.push(tslMapItemWithId);
+    this.tallyToTSLMapById[tslMapItemWithId.id] = tslMapItemWithId;
     if (this.config && this.config.hasConfigFile) {
       this.config.tallyMap = Array.from(this.tallyToTSLMap.values()).flat();
       this.config.save();
     }
-    return tslMapItem;
+    return tslMapItemWithId;
   }
 
   getTSLMap(): Map<TallyMEId, TallyTSLMapItem[]> {
     return this.tallyToTSLMap;
   }
 
-  loadTSLMap(tslMap: TallyTSLMap) {
+  loadTSLMap(tslMap: (TallyTSLMapItemNoId|TallyTSLMapItem)[]) {
     for (const mapItem of tslMap) {
       const { tallyId } = mapItem;
       if (!this.tallyToTSLMap.has(tallyId)) {
@@ -291,8 +308,12 @@ export class TallyTSLMapper {
       if (!items) {
         throw new Error(`Failed to initialize TSL map for tally ID ${tallyId}`);
       }
-      items.push(mapItem);
-      // this.tallyToTSLMap.get(tallyId)!.push(mapItem);
+      const mapItemWithId = createTSLMapItem(mapItem);
+      if (this.tallyToTSLMapById[mapItemWithId.id]) {
+        throw new Error(`Duplicate TSL map item ID ${mapItemWithId.id} found in config`);
+      }
+      items.push(mapItemWithId);
+      this.tallyToTSLMapById[mapItemWithId.id] = mapItemWithId;
     }
     debug(`Loaded TSL map with ${this.tallyToTSLMap.size} items`);
   }

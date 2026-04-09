@@ -5,6 +5,7 @@ export type {
   MixEngineIndex,
   TallyMEId,
   TallyBus,
+  TallyTSLMapItemNoId,
   TallyTSLMapItem,
   TallyTSLMap,
 } from "./tally.js";

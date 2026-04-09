@@ -1,3 +1,4 @@
+import { hash } from "./utils.js";
 
 type TSL5TallyColor = 0 | 1 | 2 | 3;
 export type TSL5TallyType = "rh_tally" | "text_tally" | "lh_tally";
@@ -56,12 +57,40 @@ export interface Tally {
 }
 
 
-export interface TallyTSLMapItem {
+export interface TallyTSLMapItemNoId {
   tallyId: TallyMEId;
   bus: TallyBus;
   screen: number;
   index: number;
   tallyType: TSL5TallyType;
   tallyColor: TallyColor;
+  id?: string;
 }
+
+export interface TallyTSLMapItem extends TallyTSLMapItemNoId {
+  id: string;
+}
+
+export function generateTSLMapItemId(item: TallyTSLMapItemNoId|TallyTSLMapItem): string {
+  return hash([
+    item.tallyId,
+    item.bus,
+    item.screen,
+    item.index,
+    item.tallyType,
+    tallyColorToValue(item.tallyColor),
+  ]);
+}
+
+export function createTSLMapItem(item: TallyTSLMapItemNoId): TallyTSLMapItem {
+  const id = generateTSLMapItemId(item);
+  if (item.id && item.id !== id) {
+    throw new Error(`Provided TSL map item ID ${item.id} does not match generated ID ${id}`);
+  }
+  return {
+    ...item,
+    id,
+  };
+}
+
 export type TallyTSLMap = TallyTSLMapItem[];
