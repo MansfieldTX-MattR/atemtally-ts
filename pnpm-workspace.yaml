@@ -16,7 +16,7 @@ catalog:
   socket.io: ^4.8.3
   socket.io-client: ^4.8.3
   "ts-node": "^10.9.2"
-  "tsl-umd-v5": "github:MansfieldTX-MattR/tsl-umd-v5#nocarryr-develop"
+  "tsl-umd-v5": "github:MansfieldTX-MattR/tsl-umd-v5#multi-tally-messages"
   "typescript": "^6.0.2"
   "typescript-eslint": "^8.58.0"
 

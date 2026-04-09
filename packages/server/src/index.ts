@@ -25,12 +25,12 @@ async function startup(): Promise<AppContext> {
   const tslMapper = new TallyTSLMapper(config);
   const tslBridge = new TallyTSLBridge(tslMapper, config.tsl5Clients, config);
   atemController.on('tallyUpdated', (tallies) => {
-    tslBridge.handleTallyUpdate(tallies);
+    tslBridge.handleTallyUpdate(tallies).catch((error) => console.error(error));
   });
   atemController.on('tallyResend', (tallies) => {
-    tslBridge.resendTallies(tallies);
+    tslBridge.resendTallies(tallies).catch((error) => console.error(error));
   });
-  tslBridge.sendAllTalliesOff(); // Ensure all tallies are off on startup
+  await tslBridge.sendAllTalliesOff(); // Ensure all tallies are off on startup
   await atemController.connect();
   debug("Starting API server...");
   const app = createApp({ tslMapper, tslBridge });
@@ -44,7 +44,7 @@ async function shutdown(context: AppContext|null): Promise<void> {
     return;
   }
   debug("Sending all tallies off...");
-  context.tslBridge.sendAllTalliesOff();
+  await context.tslBridge.sendAllTalliesOff();
   // Clean up resources, close connections, etc.
   debug("Shutting down application...");
   await stopServer(context.apiServer);

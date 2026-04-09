@@ -25,6 +25,7 @@ import {
   createTSLMapItem,
   TallyColor,
   getTallyMEId,
+  parseTallyMEId,
   tallyColorToValue
 } from "@atemtally/common";
 import type { Config } from "./config";
@@ -381,57 +382,65 @@ export class TallyTSLBridge {
     this.clients.delete(client);
   }
 
-  handleTallyUpdate(updatedTallies: Tally[]) {
-    for (const tally of updatedTallies) {
+  async handleTallyUpdate(updatedTallies: Tally[]): Promise<void> {
+    const talliesToSend = updatedTallies.filter(tally => {
       const tallyId = getTallyMEId(tally.mixEngineIndex, tally.inputIndex);
-      if (this.mapper.has(tallyId)) {
-        debug(`Tally updated for ME${tally.mixEngineIndex} input ${tally.inputIndex} with color ${tally.color}, sending to TSL`);
-        this.sendTally(tally);
-      }
-    }
+      return this.mapper.has(tallyId);
+    });
+    await this.sendMultipleTallies(talliesToSend);
   }
 
-  resendTallies(tallies: Tally[]) {
-    // debug(`Resending ${tallies.length} tallies to TSL clients`);
-    for (const tally of tallies) {
+  async resendTallies(tallies: Tally[]): Promise<void> {
+    const talliesToResend = tallies.filter(tally => {
       const tallyId = getTallyMEId(tally.mixEngineIndex, tally.inputIndex);
-      if (this.mapper.has(tallyId)) {
-        this.sendTally(tally);
-      }
-    }
+      return this.mapper.has(tallyId);
+    });
+    await this.sendMultipleTallies(talliesToResend);
   }
 
-  sendTally(tally: Tally) {
-    const tslTally = this.mapper.buildTSLTallies(tally);
-    for (const client of this.clients) {
-      // debug(`Sending tally to client ${client.host}:${client.port}:`, tslTally);
-      this.tsl.sendTallyUDP(client.host, client.port, tslTally);
-    }
-  }
-
-  sendAllTalliesOff() {
-    for (const tallyId of this.mapper.getTSLMap().keys()) {
-      const mappedTallies = this.mapper.get(tallyId);
-      if (!mappedTallies) {
-        continue;
-      }
-      for (const mappedTally of mappedTallies) {
-        const tslTally: TSL5Tally = {
-          screen: mappedTally.screen,
-          index: mappedTally.index,
-          display: {
-            rh_tally: 0,
-            text_tally: 0,
-            lh_tally: 0,
-            brightness: 3,
-            text: "",
-          }
+  async sendMultipleTallies(tallies: Tally[], forceAllOff?: boolean): Promise<void> {
+    const promises: Promise<void>[] = [];
+    const tslTallies = tallies.map(tally => this.mapper.buildTSLTallies(tally));
+    if (forceAllOff) {
+      for (const tslTally of tslTallies) {
+        tslTally.display = {
+          rh_tally: 0,
+          text_tally: 0,
+          lh_tally: 0,
         };
-        debug(`Sending all off for tally ID ${tallyId} to clients`);
-        for (const client of this.clients) {
-          this.tsl.sendTallyUDP(client.host, client.port, tslTally);
-        }
       }
     }
+    // `TSL.sendTallyUDP` can only send tallies for one screen at a time, so we need to group tallies by screen before sending
+    const talliesByScreen = Map.groupBy(tslTallies, (tally) => tally.screen);
+    const messagesByScreen = Array.from(talliesByScreen.values(),
+      (tallies) => this.tsl.constructPackets(tallies)
+    );
+    debug(`Sending ${tallies.length} tallies grouped into ${messagesByScreen.length} screens to ${this.clients.size} clients`);
+    for (const client of this.clients) {
+      for (const message of messagesByScreen) {
+        promises.push(this.tsl.sendPacketsUDP(client.host, client.port, message));
+      }
+    }
+    await Promise.all(promises);
+  }
+
+  async sendTally(tally: Tally): Promise<void> {
+    await this.sendMultipleTallies([tally]);
+  }
+
+  async sendAllTalliesOff() {
+    const talliesToSend: Tally[] = Array.from(this.mapper.getTSLMap().keys()).filter(tallyId => {
+      return this.mapper.has(tallyId);
+    }).map(tallyId => {
+      const [mixEngineIndex, inputIndex] = parseTallyMEId(tallyId);
+      return {
+        mixEngineIndex,
+        inputIndex,
+        busses: [],
+        color: TallyColor.OFF,
+        name: "",
+      } as Tally;
+    });
+    await this.sendMultipleTallies(talliesToSend, true);
   }
 }
