@@ -111,7 +111,9 @@ export class TallyCollection extends EventEmitter <TallyCollectionEvents> {
         }
       }
     }
-    this._updateTallies(atem, 0);
+    for (let meIndex = 0; meIndex < meCount; meIndex++) {
+      this._updateTallies(atem, meIndex);
+    }
     this._initialized = true;
   }
 
@@ -127,16 +129,25 @@ export class TallyCollection extends EventEmitter <TallyCollectionEvents> {
     this.emit('tallyUpdated', Array.from(this.tallies.values()));
   }
 
-  updateTallies(atem: Atem, meIndex: MixEngineIndex) {
+  getKeysForME(meIndex: MixEngineIndex): TallyMEId[] {
+    return Array.from(this.tallies.keys()).filter(key => {
+      const [keyMEIndex, keyInputIndex] = parseTallyMEId(key);
+      return keyMEIndex === meIndex;
+    });
+  }
+
+  updateTallies(atem: Atem, ...meIndex: MixEngineIndex[]) {
     if (!this._initialized) {
       return;
     }
-    this._updateTallies(atem, meIndex);
+    for (const index of meIndex) {
+      this._updateTallies(atem, index);
+    }
   }
 
   _updateTallies(atem: Atem, meIndex: MixEngineIndex) {
     const newTallies = getTallyColors(atem, meIndex);
-    const existingKeys = new Set(this.tallies.keys());
+    const existingKeys = new Set(this.getKeysForME(meIndex));
     const missingKeys = new Set(existingKeys);
     const updatedTallies: Tally[] = [];
     for (const [inputIndex, tally] of newTallies.entries()) {
@@ -147,7 +158,7 @@ export class TallyCollection extends EventEmitter <TallyCollectionEvents> {
         continue;
       }
       if (existingTally.color !== tally.color) {
-        if (existingTally.inputIndex !== tally.inputIndex || existingTally.mixEngineIndex !== tally.mixEngineIndex) {
+        if (existingTally.inputIndex !== tally.inputIndex || existingTally.mixEngineIndex !== tally.mixEngineIndex || existingTally.mixEngineIndex !== meIndex) {
           throw new Error(`Tally key mismatch for existing tally ${existingTally.inputIndex}, ${existingTally.mixEngineIndex} and new tally ${tally.inputIndex}, ${tally.mixEngineIndex}`);
         }
         existingTally.color = tally.color;
@@ -165,6 +176,10 @@ export class TallyCollection extends EventEmitter <TallyCollectionEvents> {
       }
       const tally = this.tallies.get(key);
       if (tally) {
+        const [mixEngineIndex, inputIndex] = parseTallyMEId(key);
+        if (tally.inputIndex !== inputIndex || tally.mixEngineIndex !== mixEngineIndex || mixEngineIndex !== meIndex) {
+          throw new Error(`Tally key mismatch for existing tally with key ${key} and tally with input index ${tally.inputIndex} and ME index ${tally.mixEngineIndex}`);
+        }
         if (tally.color !== TallyColor.OFF) {
           tally.color = TallyColor.OFF;
           tally.busses = [];
@@ -181,7 +196,14 @@ export class TallyCollection extends EventEmitter <TallyCollectionEvents> {
     if (meIndex === undefined) {
       return Array.from(this.tallies.values());
     }
-    return Array.from(this.tallies.values()).filter(tally => tally.mixEngineIndex === meIndex);
+    const keysForME = this.getKeysForME(meIndex);
+    return keysForME.map(key => {
+      const tally = this.tallies.get(key);
+      if (!tally) {
+        throw new Error(`Tally not found for key ${key}`);
+      }
+      return tally;
+    });
   }
 }
 

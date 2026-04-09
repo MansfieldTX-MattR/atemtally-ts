@@ -2,7 +2,7 @@ import { debug as createDebug } from "debug";
 import { EventEmitter } from 'node:events';
 import { Atem, AtemState, AtemConnectionStatus } from 'atem-connection';
 
-import type { Tally } from '@atemtally/common';
+import type { MixEngineIndex, Tally } from '@atemtally/common';
 import { TallyCollection } from './tally';
 
 type AtemAddress = string;
@@ -66,7 +66,7 @@ export class AtemController extends EventEmitter<AtemEvents> {
       if (!this.tallyCollection.initialized) {
         this.tallyCollection.initialize(this.atem, state);
       } else {
-        this.tallyCollection.updateTallies(this.atem, 0);
+        this.tallyCollection.updateTallies(this.atem, ...this.meIndices);
       }
     });
     this.atem.on('disconnected', () => {
@@ -84,6 +84,22 @@ export class AtemController extends EventEmitter<AtemEvents> {
     this.atem.on('stateChanged', (state) => this.onStateChange(state));
   }
 
+  get atemState(): AtemState {
+    const state = this.atem.state;
+    if (state === undefined) {
+      throw new Error(`Failed to retrieve state from ATEM at ${this.address}`);
+    }
+    return state;
+  }
+
+  get meCount(): number {
+    return this.atemState.info.mixEffects.length;
+  }
+
+  get meIndices(): MixEngineIndex[] {
+    return Array.from({ length: this.meCount }, (_, index) => index);
+  }
+
   private async resendTalliesPeriodically(): Promise<void> {
     while (this.running) {
       await this.delay(RESEND_TALLY_INTERVAL_MS);
@@ -94,7 +110,10 @@ export class AtemController extends EventEmitter<AtemEvents> {
         debug("Skipping resend of tallies to TSL clients because we're currently updating tallies from ATEM state change");
         continue;
       }
-      const tallies = this.tallyCollection.getTallies();
+      let tallies: Tally[] = [];
+      for (const meIndex of this.meIndices) {
+        tallies = tallies.concat(this.tallyCollection.getTallies(meIndex));
+      }
       debug(`Resending ${tallies.length} tallies to TSL clients...`);
       this.emit('tallyResend', tallies);
     }
@@ -144,7 +163,7 @@ export class AtemController extends EventEmitter<AtemEvents> {
 
   onStateChange(state: AtemState): void { // eslint-disable-line @typescript-eslint/no-unused-vars
     this.updatingTallies = true;
-    this.tallyCollection.updateTallies(this.atem, 0);
+    this.tallyCollection.updateTallies(this.atem, ...this.meIndices);
     this.updatingTallies = false;
   }
 }
