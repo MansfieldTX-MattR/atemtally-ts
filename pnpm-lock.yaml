@@ -24,11 +24,17 @@ catalogs:
     eslint:
       specifier: ^9.39.4
       version: 9.39.4
+    socket.io:
+      specifier: ^4.8.3
+      version: 4.8.3
+    socket.io-client:
+      specifier: ^4.8.3
+      version: 4.8.3
     ts-node:
       specifier: ^10.9.2
       version: 10.9.2
     tsl-umd-v5:
-      specifier: github:MansfieldTX-MattR/tsl-umd-v5#nocarryr-develop
+      specifier: github:MansfieldTX-MattR/tsl-umd-v5#multi-tally-messages
       version: 1.0.7
     typescript:
       specifier: ^6.0.2
@@ -62,6 +68,12 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 9.39.4(jiti@2.6.1)
+      socket.io:
+        specifier: 'catalog:'
+        version: 4.8.3
+      socket.io-client:
+        specifier: 'catalog:'
+        version: 4.8.3
       ts-node:
         specifier: 'catalog:'
         version: 10.9.2(@types/node@25.5.0)(typescript@6.0.2)
@@ -86,9 +98,12 @@ importers:
       express:
         specifier: ^5.2.1
         version: 5.2.1
+      socket.io:
+        specifier: 'catalog:'
+        version: 4.8.3
       tsl-umd-v5:
         specifier: 'catalog:'
-        version: https://codeload.github.com/MansfieldTX-MattR/tsl-umd-v5/tar.gz/b9d7d6315081d7afa07ef14e8435091d9e2d8ff3
+        version: https://codeload.github.com/MansfieldTX-MattR/tsl-umd-v5/tar.gz/cf2a907dd65ded20436c9f22ce9afa2b1894fd29
     devDependencies:
       '@atemtally/common':
         specifier: workspace:*
@@ -145,14 +160,14 @@ importers:
         specifier: 19.2.4
         version: 19.2.4(react@19.2.4)
       socket.io:
-        specifier: ^4.8.3
+        specifier: 'catalog:'
         version: 4.8.3
       socket.io-client:
-        specifier: ^4.8.3
+        specifier: 'catalog:'
         version: 4.8.3
       tsl-umd-v5:
         specifier: 'catalog:'
-        version: https://codeload.github.com/MansfieldTX-MattR/tsl-umd-v5/tar.gz/b9d7d6315081d7afa07ef14e8435091d9e2d8ff3
+        version: https://codeload.github.com/MansfieldTX-MattR/tsl-umd-v5/tar.gz/cf2a907dd65ded20436c9f22ce9afa2b1894fd29
     devDependencies:
       '@eslint/js':
         specifier: 'catalog:'
@@ -160,9 +175,6 @@ importers:
       '@tailwindcss/postcss':
         specifier: ^4
         version: 4.2.2
-      '@types/axios':
-        specifier: ^0.14.4
-        version: 0.14.4(debug@4.4.3)
       '@types/debug':
         specifier: 'catalog:'
         version: 4.1.13
@@ -180,7 +192,7 @@ importers:
         version: 9.39.4(jiti@2.6.1)
       eslint-config-next:
         specifier: 16.2.1
-        version: 16.2.1(@typescript-eslint/parser@8.58.0(eslint@9.39.4(jiti@2.6.1))(typescript@6.0.2))(eslint@9.39.4(jiti@2.6.1))(typescript@6.0.2)
+        version: 16.2.1(eslint@9.39.4(jiti@2.6.1))(typescript@6.0.2)
       tailwindcss:
         specifier: ^4
         version: 4.2.2
@@ -888,10 +900,6 @@ packages:
 
   '@tybys/wasm-util@0.10.1':
     resolution: {integrity: sha512-9tTaPJLSiejZKx+Bmog4uSubteqTvFrVrURwkmHixBo0G4seD0zUxp98E1DzUBJxLQ3NPwXrGKDiVjwx/DpPsg==}
-
-  '@types/axios@0.14.4':
-    resolution: {integrity: sha512-9JgOaunvQdsQ/qW2OPmE5+hCeUB52lQSolecrFrthct55QekhmXEwT203s20RL+UHtCQc15y3VXpby9E7Kkh/g==}
-    deprecated: This is a stub types definition. axios provides its own type definitions, so you do not need this installed.
 
   '@types/body-parser@1.19.6':
     resolution: {integrity: sha512-HLFeCYgz89uk22N5Qg3dvGvsv46B8GLvKKo1zKG4NybA8U2DiEO3w9lqGg29t/tfLRJpJ6iQxnVw4OnB7MoM9g==}
@@ -2673,8 +2681,8 @@ packages:
   tsconfig-paths@3.15.0:
     resolution: {integrity: sha512-2Ac2RgzDe/cn48GvOe3M+o82pEFewD3UPbyoUHHdKasHwJKjds4fLXWf/Ux5kATBKN20oaFGu+jbElp1pos0mg==}
 
-  tsl-umd-v5@https://codeload.github.com/MansfieldTX-MattR/tsl-umd-v5/tar.gz/b9d7d6315081d7afa07ef14e8435091d9e2d8ff3:
-    resolution: {tarball: https://codeload.github.com/MansfieldTX-MattR/tsl-umd-v5/tar.gz/b9d7d6315081d7afa07ef14e8435091d9e2d8ff3}
+  tsl-umd-v5@https://codeload.github.com/MansfieldTX-MattR/tsl-umd-v5/tar.gz/cf2a907dd65ded20436c9f22ce9afa2b1894fd29:
+    resolution: {tarball: https://codeload.github.com/MansfieldTX-MattR/tsl-umd-v5/tar.gz/cf2a907dd65ded20436c9f22ce9afa2b1894fd29}
     version: 1.0.7
 
   tslib@1.14.1:
@@ -3400,12 +3408,6 @@ snapshots:
     dependencies:
       tslib: 2.8.1
     optional: true
-
-  '@types/axios@0.14.4(debug@4.4.3)':
-    dependencies:
-      axios: 1.14.0(debug@4.4.3)
-    transitivePeerDependencies:
-      - debug
 
   '@types/body-parser@1.19.6':
     dependencies:
@@ -4143,13 +4145,13 @@ snapshots:
 
   escape-string-regexp@4.0.0: {}
 
-  eslint-config-next@16.2.1(@typescript-eslint/parser@8.58.0(eslint@9.39.4(jiti@2.6.1))(typescript@6.0.2))(eslint@9.39.4(jiti@2.6.1))(typescript@6.0.2):
+  eslint-config-next@16.2.1(eslint@9.39.4(jiti@2.6.1))(typescript@6.0.2):
     dependencies:
       '@next/eslint-plugin-next': 16.2.1
       eslint: 9.39.4(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0)(eslint@9.39.4(jiti@2.6.1))
-      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.58.0(eslint@9.39.4(jiti@2.6.1))(typescript@6.0.2))(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.4(jiti@2.6.1))
+      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.4(jiti@2.6.1)))(eslint@9.39.4(jiti@2.6.1))
+      eslint-plugin-import: 2.32.0(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.4(jiti@2.6.1)))(eslint@9.39.4(jiti@2.6.1)))(eslint@9.39.4(jiti@2.6.1))
       eslint-plugin-jsx-a11y: 6.10.2(eslint@9.39.4(jiti@2.6.1))
       eslint-plugin-react: 7.37.5(eslint@9.39.4(jiti@2.6.1))
       eslint-plugin-react-hooks: 7.0.1(eslint@9.39.4(jiti@2.6.1))
@@ -4171,7 +4173,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0)(eslint@9.39.4(jiti@2.6.1)):
+  eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.4(jiti@2.6.1)))(eslint@9.39.4(jiti@2.6.1)):
     dependencies:
       '@nolyfill/is-core-module': 1.0.39
       debug: 4.4.3
@@ -4182,22 +4184,21 @@ snapshots:
       tinyglobby: 0.2.15
       unrs-resolver: 1.11.1
     optionalDependencies:
-      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.58.0(eslint@9.39.4(jiti@2.6.1))(typescript@6.0.2))(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.4(jiti@2.6.1))
+      eslint-plugin-import: 2.32.0(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.4(jiti@2.6.1)))(eslint@9.39.4(jiti@2.6.1)))(eslint@9.39.4(jiti@2.6.1))
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.1(@typescript-eslint/parser@8.58.0(eslint@9.39.4(jiti@2.6.1))(typescript@6.0.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.4(jiti@2.6.1)):
+  eslint-module-utils@2.12.1(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.4(jiti@2.6.1)))(eslint@9.39.4(jiti@2.6.1)))(eslint@9.39.4(jiti@2.6.1)):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
-      '@typescript-eslint/parser': 8.58.0(eslint@9.39.4(jiti@2.6.1))(typescript@6.0.2)
       eslint: 9.39.4(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0)(eslint@9.39.4(jiti@2.6.1))
+      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.4(jiti@2.6.1)))(eslint@9.39.4(jiti@2.6.1))
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.58.0(eslint@9.39.4(jiti@2.6.1))(typescript@6.0.2))(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.4(jiti@2.6.1)):
+  eslint-plugin-import@2.32.0(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.4(jiti@2.6.1)))(eslint@9.39.4(jiti@2.6.1)))(eslint@9.39.4(jiti@2.6.1)):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.9
@@ -4208,7 +4209,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 9.39.4(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.1(@typescript-eslint/parser@8.58.0(eslint@9.39.4(jiti@2.6.1))(typescript@6.0.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.4(jiti@2.6.1))
+      eslint-module-utils: 2.12.1(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.4(jiti@2.6.1)))(eslint@9.39.4(jiti@2.6.1)))(eslint@9.39.4(jiti@2.6.1))
       hasown: 2.0.2
       is-core-module: 2.16.1
       is-glob: 4.0.3
@@ -4219,8 +4220,6 @@ snapshots:
       semver: 6.3.1
       string.prototype.trimend: 1.0.9
       tsconfig-paths: 3.15.0
-    optionalDependencies:
-      '@typescript-eslint/parser': 8.58.0(eslint@9.39.4(jiti@2.6.1))(typescript@6.0.2)
     transitivePeerDependencies:
       - eslint-import-resolver-typescript
       - eslint-import-resolver-webpack
@@ -5490,7 +5489,7 @@ snapshots:
       minimist: 1.2.8
       strip-bom: 3.0.0
 
-  tsl-umd-v5@https://codeload.github.com/MansfieldTX-MattR/tsl-umd-v5/tar.gz/b9d7d6315081d7afa07ef14e8435091d9e2d8ff3:
+  tsl-umd-v5@https://codeload.github.com/MansfieldTX-MattR/tsl-umd-v5/tar.gz/cf2a907dd65ded20436c9f22ce9afa2b1894fd29:
     dependencies:
       debug: 4.4.3
     transitivePeerDependencies:
