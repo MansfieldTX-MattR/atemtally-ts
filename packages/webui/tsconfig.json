@@ -12,7 +12,9 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
+    "sourceMap": true,
     "incremental": true,
+    "preserveSymlinks": false,
     "plugins": [
       {
         "name": "next"
