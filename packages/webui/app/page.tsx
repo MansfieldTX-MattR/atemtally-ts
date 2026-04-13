@@ -5,6 +5,8 @@ import TallyDashboard from "./components/TallyDashboard";
 import { getWebsocketUri } from "./actions";
 import type { GetTSLMapResponse } from "@atemtally/common";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   let initialMap: GetTSLMapResponse = {};
   try {
