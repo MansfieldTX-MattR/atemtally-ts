@@ -30,6 +30,7 @@ export class AtemController extends EventEmitter<AtemEvents> {
   private timeoutId: NodeJS.Timeout | null = null;
   readonly address: AtemAddress;
   readonly tallyCollection: TallyCollection;
+  private _atemState: AtemState | null = null;
 
   constructor(address: AtemAddress) {
     super();
@@ -87,8 +88,13 @@ export class AtemController extends EventEmitter<AtemEvents> {
   get atemState(): AtemState {
     const state = this.atem.state;
     if (state === undefined) {
+      if (this._atemState) {
+        debug(`Warning: ATEM state is undefined, using last known state`);
+        return this._atemState;
+      }
       throw new Error(`Failed to retrieve state from ATEM at ${this.address}`);
     }
+    this._atemState = state;
     return state;
   }
 
@@ -162,6 +168,7 @@ export class AtemController extends EventEmitter<AtemEvents> {
   }
 
   onStateChange(state: AtemState): void { // eslint-disable-line @typescript-eslint/no-unused-vars
+    this._atemState = state;
     this.updatingTallies = true;
     this.tallyCollection.updateTallies(this.atem, ...this.meIndices);
     this.updatingTallies = false;
