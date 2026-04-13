@@ -131,7 +131,7 @@ export class TallyCollection extends EventEmitter <TallyCollectionEvents> {
 
   getKeysForME(meIndex: MixEngineIndex): TallyMEId[] {
     return Array.from(this.tallies.keys()).filter(key => {
-      const [keyMEIndex, keyInputIndex] = parseTallyMEId(key);
+      const [keyMEIndex] = parseTallyMEId(key);
       return keyMEIndex === meIndex;
     });
   }

@@ -113,7 +113,12 @@ const UnmapButton = ({ item, onRefresh }: { item: TallyTSLMapItemWithActive, onR
       >
         Unmap
       </button>
-      {showConfirm && <ConfirmUnmapModal onConfirm={handleConfirm} onCancel={() => setShowConfirm(false)} />}
+      {showConfirm &&
+        <ConfirmUnmapModal
+          onConfirm={() => { handleConfirm().catch(console.error); setShowConfirm(false); }}
+          onCancel={() => setShowConfirm(false)}
+        />
+      }
     </>
   );
 };

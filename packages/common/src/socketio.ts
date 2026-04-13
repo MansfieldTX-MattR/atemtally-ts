@@ -39,7 +39,7 @@ export type ListenEvents = ClientToServerEvents;
 export type ServerSideEvents = InterServerEvents;
 
 
-type Constructor<T, P extends any[]> = new (...args: P) => T;
+type Constructor<T, P extends unknown[]> = new (...args: P) => T;
 
 type SocketIOServerParameters = [srv?: TServerInstance | number, options?: Partial<ServerOptions>];
 export type SocketIOServerConstructor = Constructor<SocketIOServer<ListenEvents, EmitEvents, ServerSideEvents, SocketData>, SocketIOServerParameters>;
@@ -56,7 +56,7 @@ export type ClientSocketType = ClientSocket<ServerToClientEvents, ClientToServer
 
 
 
-function createInstance<T, P extends any[]>(cls: Constructor<T, P>, ...args: P): T {
+function createInstance<T, P extends unknown[]>(cls: Constructor<T, P>, ...args: P): T {
   return new cls(...args);
 }
 
