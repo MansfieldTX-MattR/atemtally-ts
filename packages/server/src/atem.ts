@@ -167,7 +167,7 @@ export class AtemController extends EventEmitter<AtemEvents> {
     return this.atem.status === AtemConnectionStatus.CONNECTED;
   }
 
-  onStateChange(state: AtemState): void { // eslint-disable-line @typescript-eslint/no-unused-vars
+  onStateChange(state: AtemState): void {
     this._atemState = state;
     this.updatingTallies = true;
     this.tallyCollection.updateTallies(this.atem, ...this.meIndices);
