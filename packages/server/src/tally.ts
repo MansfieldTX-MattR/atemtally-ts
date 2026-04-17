@@ -26,7 +26,8 @@ import {
   TallyColor,
   getTallyMEId,
   parseTallyMEId,
-  tallyColorToValue
+  tallyColorToValue,
+  generateTSLMapItemId,
 } from "@atemtally/common";
 import type { Config } from "./config";
 
@@ -373,6 +374,44 @@ export class TallyTSLMapper extends EventEmitter<TallyTSLMapperEvents> {
       this.config.save();
     }
     return true;
+  }
+
+  updateMapItem(id: string, updatedFields: Partial<TallyTSLMapItemNoId>): TallyTSLMapItem {
+    const mapItem = this.tallyToTSLMapById[id];
+    if (!mapItem) {
+      throw new Error(`TSL map item with ID ${id} not found`);
+    }
+    if (updatedFields.tallyId && updatedFields.tallyId !== mapItem.tallyId) {
+      throw new Error(`Cannot change tallyId of TSL map item with ID ${id}`);
+    }
+    const updatedItem = {
+      ...mapItem,
+      ...updatedFields,
+    };
+    const items = this.tallyToTSLMap.get(mapItem.tallyId);
+    if (!items) {
+      throw new Error(`TSL map items for tally ID ${mapItem.tallyId} not found`);
+    }
+    const index = items.findIndex(item => item.id === id);
+    if (index === -1) {
+      throw new Error(`TSL map item with ID ${id} not found in tallyToTSLMap`);
+    }
+    const newId = generateTSLMapItemId(updatedItem);
+    if (newId !== id) {
+
+      if (this.tallyToTSLMapById[newId]) {
+        throw new Error(`TSL map item with ID ${newId} already exists`);
+      }
+      delete this.tallyToTSLMapById[id];
+      updatedItem.id = newId;
+    }
+    items[index] = updatedItem;
+    this.tallyToTSLMapById[newId] = updatedItem;
+    if (this.config && this.config.hasConfigFile) {
+      this.config.tallyMap = Array.from(this.tallyToTSLMap.values()).flat();
+      this.config.save();
+    }
+    return updatedItem;
   }
 
   getTSLMap(): Map<TallyMEId, TallyTSLMapItem[]> {

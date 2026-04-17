@@ -5,6 +5,7 @@ import type {
   TallyMEId,
   TallyColor,
   TallyTSLMapItem,
+  TallyTSLMapItemNoId,
   TSL5TallyType,
   TallyTSLMapItemWithActive,
 } from "./tally.js";
@@ -24,6 +25,8 @@ export type MapTallyResponse = TallyTSLMapItem;
 export interface UnmapTallyRequestParams {
   id: string;
 }
+
+export type UpdateTSLMapItemRequestBody = Partial<TallyTSLMapItemNoId>;
 
 export type UnmapTallyResponse = { ok: boolean };
 

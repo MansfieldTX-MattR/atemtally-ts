@@ -6,6 +6,7 @@ import type {
   MapTallyResponse,
   UnmapTallyResponse,
   GetTSLMapResponse,
+  UpdateTSLMapItemRequestBody,
   SendAllOffResponse,
   ErrorResponse,
 } from "@atemtally/common";
@@ -28,6 +29,11 @@ export async function mapTallyToTSL(
   body: MapTallyRequestBody
 ): Promise<MapTallyResponse | ErrorResponse> {
   const res = await axios.post<MapTallyResponse>(`${API_BASE}/api/tally/map`, body);
+  return res.data;
+}
+
+export async function updateTSLMapItem(id: string, body: UpdateTSLMapItemRequestBody): Promise<GetTSLMapResponse | ErrorResponse> {
+  const res = await axios.patch<GetTSLMapResponse>(`${API_BASE}/api/tally/map/${id}`, body);
   return res.data;
 }
 

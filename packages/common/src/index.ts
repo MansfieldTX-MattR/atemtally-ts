@@ -19,6 +19,7 @@ export type {
   MapTallyRequestBody,
   MapTallyResponse,
   GetTSLMapResponse,
+  UpdateTSLMapItemRequestBody,
   SendAllOffResponse,
   UnmapTallyRequestParams,
   UnmapTallyResponse,

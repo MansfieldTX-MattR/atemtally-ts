@@ -12,6 +12,7 @@ import type {
   UnmapTallyRequestParams,
   UnmapTallyResponse,
   GetTSLMapResponse,
+  UpdateTSLMapItemRequestBody,
   SendAllOffResponse,
   ErrorResponse,
   SocketType,
@@ -87,6 +88,29 @@ export function createApp(deps: ApiDeps): HTTPServer {
   });
 
   app.get("/api/tally/map", (_req: Request, res: ApiResponse<GetTSLMapResponse>) => {
+    const tslMap = deps.tslMapper.getTSLMap();
+    const mapObj: GetTSLMapResponse = {};
+    for (const [key, value] of tslMap.entries()) {
+      mapObj[key] = value.map((item) => ({
+        ...item,
+        active: deps.tslMapper.getItemActive(item.id),
+      }));
+    }
+    res.json(mapObj);
+  });
+
+  app.patch("/api/tally/map/:id", (req: ApiRequest<UpdateTSLMapItemRequestBody, GetTSLMapResponse, UnmapTallyRequestParams>, res: ApiResponse<GetTSLMapResponse>) => {
+    const { id } = req.params;
+    if (!id) {
+      res.status(400).json({ error: "Missing required parameter: id" });
+      return;
+    }
+    const item = deps.tslMapper.getById(id);
+    if (!item) {
+      res.status(404).json({ error: "Tally mapping not found" });
+      return;
+    }
+    deps.tslMapper.updateMapItem(id, req.body);
     const tslMap = deps.tslMapper.getTSLMap();
     const mapObj: GetTSLMapResponse = {};
     for (const [key, value] of tslMap.entries()) {

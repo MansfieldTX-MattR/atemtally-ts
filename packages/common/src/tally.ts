@@ -65,6 +65,7 @@ export interface TallyTSLMapItemNoId {
   tallyType: TSL5TallyType;
   tallyColor: TallyColor;
   id?: string;
+  name?: string;
 }
 
 export interface TallyTSLMapItem extends TallyTSLMapItemNoId {
