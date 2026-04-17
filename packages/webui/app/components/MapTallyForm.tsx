@@ -44,16 +44,19 @@ export default function MapTallyForm({ loading, onSubmit }: MapTallyFormProps) {
       <form onSubmit={(e) => { handleSubmit(e).catch(console.error); }} className="grid grid-cols-2 gap-4 max-w-lg">
         <NumberField
           label="Input Index"
+          name="inputIndex"
           value={inputIndex}
           onChange={setInputIndex}
         />
         <NumberField
           label="Mix Engine Index"
+          name="mixEngineIndex"
           value={mixEngineIndex}
           onChange={setMixEngineIndex}
         />
         <SelectField
           label="Color"
+          name="color"
           value={color}
           onChange={setColor}
           options={[
@@ -65,6 +68,7 @@ export default function MapTallyForm({ loading, onSubmit }: MapTallyFormProps) {
         />
         <SelectField
           label="Bus"
+          name="bus"
           value={bus}
           onChange={setBus}
           options={[
@@ -74,6 +78,7 @@ export default function MapTallyForm({ loading, onSubmit }: MapTallyFormProps) {
         />
         <SelectField
           label="Tally Type"
+          name="tallyType"
           value={tallyType}
           onChange={setTallyType}
           options={[
@@ -84,6 +89,7 @@ export default function MapTallyForm({ loading, onSubmit }: MapTallyFormProps) {
         />
         <TextField
           label="Name (optional)"
+          name="name"
           value={name}
           onChange={setName}
         />
@@ -101,6 +107,7 @@ export default function MapTallyForm({ loading, onSubmit }: MapTallyFormProps) {
 
 interface FormFieldProps<T> {
   label: string;
+  name: string;
   value: T;
   onChange: (v: T) => void;
   children?: React.ReactNode;
@@ -127,6 +134,7 @@ function TextField(props: FormFieldProps<string>) {
     <FormField {...props} >
       <input
         type="text"
+        name={props.name}
         value={props.value}
         onChange={(e) => props.onChange(e.target.value)}
         className={`${FormFieldDefaults.fieldClassName} ${props.fieldClassName ?? ""}`}
@@ -140,6 +148,7 @@ function NumberField<T extends number>(props: FormFieldProps<T>) {
     <FormField {...props} >
       <input
         type="number"
+        name={props.name}
         value={props.value}
         onChange={(e) => props.onChange(typeof props.value === "number" ? Number(e.target.value) as T : (e.target.value as unknown as T))}
         className={`${FormFieldDefaults.fieldClassName} ${props.fieldClassName ?? ""}`}
@@ -161,6 +170,7 @@ function SelectField<T extends string | number> (props: SelectFieldProps<T>) {
   return (
     <FormField {...props} >
       <select
+        name={props.name}
         value={String(props.value)}
         onChange={(e) => props.onChange(e.target.value as unknown as T)}
         className={`${FormFieldDefaults.fieldClassName} ${props.fieldClassName ?? ""}`}
