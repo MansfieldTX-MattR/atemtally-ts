@@ -1,27 +1,77 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useEffectEvent } from "react";
 import type {
   MapTallyRequestBody,
-  TallyTSLMapItem,
+  UpdateTSLMapItemRequestBody,
   TallyBus,
+  TallyColorName,
   TSL5TallyType,
 } from "@atemtally/common";
-import { TallyColor } from "@atemtally/common";
+import { TallyColor, tallyColorToName, tallyColorNameToTallyColor } from "@atemtally/common";
 
-interface MapTallyFormProps {
+interface MapTallyFormProps<T> {
+  titleText: string;
+  submitButtonText?: string;
   loading: boolean;
-  onSubmit: (body: MapTallyRequestBody) => Promise<TallyTSLMapItem | null>;
+  initialValues?: Partial<UpdateTSLMapItemRequestBody>;
+  onCancel?: () => void;
+  onSubmit: (body: MapTallyRequestBody) => Promise<T | null>;
 }
 
-export default function MapTallyForm({ loading, onSubmit }: MapTallyFormProps) {
-  const [inputIndex, setInputIndex] = useState(1);
-  const [mixEngineIndex, setMixEngineIndex] = useState(0);
-  const [color, setColor] = useState<TallyColor>(TallyColor.RED);
-  const [bus, setBus] = useState<TallyBus>("program");
-  const [tallyType, setTallyType] = useState<TSL5TallyType>("rh_tally");
-  const [name, setName] = useState("");
-  const [mapResult, setMapResult] = useState<TallyTSLMapItem | null>(null);
+const FormFieldStateDefaults = {
+  inputIndex: 1,
+  mixEngineIndex: 0,
+  color: TallyColor.RED,
+  bus: "program",
+  tallyType: "lh_tally",
+} as const;
+
+function updateMapItemRequestBodyToMapTallyRequestBody(body: UpdateTSLMapItemRequestBody): MapTallyRequestBody {
+  return {
+    inputIndex: body.index ?? FormFieldStateDefaults.inputIndex,
+    mixEngineIndex: body.screen ?? FormFieldStateDefaults.mixEngineIndex,
+    color: body.tallyColor ?? FormFieldStateDefaults.color,
+    bus: body.bus ?? FormFieldStateDefaults.bus,
+    tallyType: body.tallyType ?? FormFieldStateDefaults.tallyType,
+    name: undefined,
+  };
+}
+
+export default function MapTallyForm<T>({ titleText, submitButtonText = "Submit", loading, initialValues, onCancel, onSubmit }: MapTallyFormProps<T>) {
+  const initialUpdateBody = initialValues ? updateMapItemRequestBodyToMapTallyRequestBody(initialValues) : undefined;
+  const [inputIndex, setInputIndex] = useState(initialUpdateBody?.inputIndex ?? FormFieldStateDefaults.inputIndex);
+  const [mixEngineIndex, setMixEngineIndex] = useState(initialUpdateBody?.mixEngineIndex ?? FormFieldStateDefaults.mixEngineIndex);
+  const [color, setColor] = useState<TallyColor>(initialUpdateBody?.color ?? FormFieldStateDefaults.color);
+  const [bus, setBus] = useState<TallyBus>(initialUpdateBody?.bus ?? FormFieldStateDefaults.bus);
+  const [tallyType, setTallyType] = useState<TSL5TallyType>(initialUpdateBody?.tallyType ?? FormFieldStateDefaults.tallyType);
+  const [name, setName] = useState(initialUpdateBody?.name ?? "");
+  const [mapResult, setMapResult] = useState<T | null>(null);
+
+  const resetStates = useEffectEvent(() => {
+    setInputIndex(initialUpdateBody?.inputIndex ?? FormFieldStateDefaults.inputIndex);
+    setMixEngineIndex(initialUpdateBody?.mixEngineIndex ?? FormFieldStateDefaults.mixEngineIndex);
+    setColor(initialUpdateBody?.color ?? FormFieldStateDefaults.color);
+    setBus(initialUpdateBody?.bus ?? FormFieldStateDefaults.bus);
+    setTallyType(initialUpdateBody?.tallyType ?? FormFieldStateDefaults.tallyType);
+    setName(initialUpdateBody?.name ?? "");
+    console.log("setColor: ", initialUpdateBody?.color);
+    setMapResult(null);
+  });
+
+  useEffect(() => {
+    resetStates();
+  }, [initialValues]);
+
+  const hasInitialValues = initialValues !== undefined;
+  const isDirty = hasInitialValues && (
+    inputIndex !== initialUpdateBody?.inputIndex ||
+    mixEngineIndex !== initialUpdateBody?.mixEngineIndex ||
+    color !== initialUpdateBody?.color ||
+    bus !== initialUpdateBody?.bus ||
+    tallyType !== initialUpdateBody?.tallyType ||
+    name !== initialUpdateBody?.name
+  );
 
   async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -40,7 +90,7 @@ export default function MapTallyForm({ loading, onSubmit }: MapTallyFormProps) {
 
   return (
     <section>
-      <h2 className="text-xl font-semibold mb-4">Map Tally to TSL</h2>
+      <h2 className="text-xl font-semibold mb-4">{titleText}</h2>
       <form onSubmit={(e) => { handleSubmit(e).catch(console.error); }} className="grid grid-cols-2 gap-4 max-w-lg">
         <NumberField
           label="Input Index"
@@ -54,19 +104,19 @@ export default function MapTallyForm({ loading, onSubmit }: MapTallyFormProps) {
           value={mixEngineIndex}
           onChange={setMixEngineIndex}
         />
-        <SelectField
+        <SelectField<TallyColorName>
           label="Color"
           name="color"
-          value={color}
-          onChange={setColor}
+          value={tallyColorToName(color)}
+          onChange={(v) => setColor(tallyColorNameToTallyColor(v))}
           options={[
-            { label: "Off", value: TallyColor.OFF },
-            { label: "Red", value: TallyColor.RED },
-            { label: "Green", value: TallyColor.GREEN },
-            { label: "Amber", value: TallyColor.AMBER },
+            { label: "Off", value: "OFF" },
+            { label: "Red", value: "RED" },
+            { label: "Green", value: "GREEN" },
+            { label: "Amber", value: "AMBER" },
           ]}
         />
-        <SelectField
+        <SelectField<TallyBus>
           label="Bus"
           name="bus"
           value={bus}
@@ -76,7 +126,7 @@ export default function MapTallyForm({ loading, onSubmit }: MapTallyFormProps) {
             { label: "Preview", value: "preview" },
           ]}
         />
-        <SelectField
+        <SelectField<TSL5TallyType>
           label="Tally Type"
           name="tallyType"
           value={tallyType}
@@ -93,7 +143,18 @@ export default function MapTallyForm({ loading, onSubmit }: MapTallyFormProps) {
           value={name}
           onChange={setName}
         />
-        <SubmitField label="Map Tally" loading={loading} />
+        <div className="flex gap-4">
+          <SubmitField label={submitButtonText} loading={loading} disabled={hasInitialValues ? !isDirty : false} />
+          {onCancel && (
+            <button
+              type="button"
+              onClick={onCancel}
+              className="rounded bg-gray-600 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700"
+            >
+              Cancel
+            </button>
+          )}
+        </div>
       </form>
       {mapResult && (
         <pre className="mt-4 rounded bg-zinc-100 p-4 text-sm overflow-x-auto dark:bg-zinc-800">
@@ -113,6 +174,7 @@ interface FormFieldProps<T> {
   children?: React.ReactNode;
   className?: string;
   fieldClassName?: string;
+  disabled?: boolean;
 }
 
 const FormFieldDefaults = {
@@ -138,6 +200,7 @@ function TextField(props: FormFieldProps<string>) {
         value={props.value}
         onChange={(e) => props.onChange(e.target.value)}
         className={`${FormFieldDefaults.fieldClassName} ${props.fieldClassName ?? ""}`}
+        disabled={props.disabled}
       />
     </FormField>
   );
@@ -152,6 +215,7 @@ function NumberField<T extends number>(props: FormFieldProps<T>) {
         value={props.value}
         onChange={(e) => props.onChange(typeof props.value === "number" ? Number(e.target.value) as T : (e.target.value as unknown as T))}
         className={`${FormFieldDefaults.fieldClassName} ${props.fieldClassName ?? ""}`}
+        disabled={props.disabled}
       />
     </FormField>
   );
@@ -174,6 +238,7 @@ function SelectField<T extends string | number> (props: SelectFieldProps<T>) {
         value={String(props.value)}
         onChange={(e) => props.onChange(e.target.value as unknown as T)}
         className={`${FormFieldDefaults.fieldClassName} ${props.fieldClassName ?? ""}`}
+        disabled={props.disabled}
       >
         {props.options.map((opt) => (
           <option key={String(opt.value)} value={String(opt.value)}>
@@ -185,17 +250,23 @@ function SelectField<T extends string | number> (props: SelectFieldProps<T>) {
   );
 }
 
+interface SubmitFieldProps {
+  label: string;
+  loading: boolean;
+  className?: string;
+  fieldClassName?: string;
+  disabled?: boolean;
+}
 
 function SubmitField(
-  { label, loading, className, fieldClassName }:
-  { label: string; loading: boolean; className?: string; fieldClassName?: string }
+  { label, loading, className, fieldClassName, disabled }: SubmitFieldProps
 ) {
   const defaultFieldClass = "rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50";
   return (
     <div className={`col-span-2 ${className ?? ""}`}>
       <button
         type="submit"
-        disabled={loading}
+        disabled={loading || disabled}
         className={`${defaultFieldClass} ${fieldClassName ?? ""}`}
       >
         {label}

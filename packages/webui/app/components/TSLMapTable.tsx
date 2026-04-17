@@ -7,6 +7,8 @@ import { unmapTallyFromTSL } from "../actions";
 interface TSLMapTableProps {
   tslMap: TallyTSLMapWithActive;
   loading: boolean;
+  editingItemId?: string;
+  onEditButtonClick: (itemId: string) => void;
   onRefresh: () => Promise<void>;
 }
 
@@ -20,7 +22,7 @@ function tallyColorLabel(c: TallyColor) {
   }
 }
 
-export default function TSLMapTable({ tslMap, loading, onRefresh }: TSLMapTableProps) {
+export default function TSLMapTable({ tslMap, loading, editingItemId, onEditButtonClick, onRefresh }: TSLMapTableProps) {
   return (
     <section>
       <div className="flex items-center justify-between mb-4">
@@ -46,12 +48,20 @@ export default function TSLMapTable({ tslMap, loading, onRefresh }: TSLMapTableP
                 <th className="py-2 pr-4">Index</th>
                 <th className="py-2 pr-4">Tally Type</th>
                 <th className="py-2">Color</th>
+                <th className="py-2">Name</th>
                 <th className="py-2"></th>
               </tr>
             </thead>
             <tbody>
               {Object.entries(tslMap).flatMap(([tallyId, items]) =>
-                items.map((item, i) => <TallyMapItemRow key={`${tallyId}-${i}`} item={item} onRefresh={onRefresh} />)
+                items.map((item, i) =>
+                  <TallyMapItemRow
+                    key={`${tallyId}-${i}`}
+                    item={item} editingItemId={editingItemId}
+                    onRefresh={onRefresh}
+                    onEditButtonClick={onEditButtonClick}
+                  />
+                )
               )}
             </tbody>
           </table>
@@ -61,8 +71,19 @@ export default function TSLMapTable({ tslMap, loading, onRefresh }: TSLMapTableP
   );
 }
 
-const TallyMapItemRow = ({ item, onRefresh }: { item: TallyTSLMapItemWithActive, onRefresh: () => Promise<void> }) => {
+interface TallyMapItemRowProps {
+  item: TallyTSLMapItemWithActive;
+  editingItemId?: string;
+  onRefresh: () => Promise<void>;
+  onEditButtonClick: (itemId: string) => void;
+}
+
+const TallyMapItemRow = ({ item, editingItemId, onRefresh, onEditButtonClick }: TallyMapItemRowProps) => {
+  const isEditing = editingItemId === item.id;
   function getBgColor() {
+    if (isEditing) {
+      return "bg-blue-50 dark:bg-blue-900";
+    }
     if (!item.active) return "";
     switch (item.tallyColor) {
       case TallyColor.RED: return "bg-red-100 dark:bg-red-800";
@@ -79,7 +100,17 @@ const TallyMapItemRow = ({ item, onRefresh }: { item: TallyTSLMapItemWithActive,
       <td className="py-2 pr-4">{item.index}</td>
       <td className="py-2 pr-4">{item.tallyType}</td>
       <td className="py-2">{tallyColorLabel(item.tallyColor)}</td>
-      <td className="py-2 text-right"><UnmapButton item={item} onRefresh={onRefresh} /></td>
+      <td className="py-2 pr-4">{item.name}</td>
+      <td className="py-2 text-right">
+        <button
+          type="button"
+          onClick={() => onEditButtonClick(item.id)}
+          className="rounded bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700"
+        >
+          Edit
+        </button>
+        <UnmapButton item={item} onRefresh={onRefresh} />
+      </td>
     </tr>
   );
 };

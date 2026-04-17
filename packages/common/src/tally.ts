@@ -25,12 +25,21 @@ export enum TallyColor {
   AMBER = 1 | 2,
 }
 
-export function tallyColorToValue(color: TallyColor|TSL5TallyColor): TSL5TallyColor {
+export type TallyColorName = keyof typeof TallyColor;
+
+export function tallyColorToValue(color: TallyColor|TSL5TallyColor|TallyColorName): TSL5TallyColor {
   if (typeof color === "number") {
     if (color >= 0 && color <= 3) {
       return color;
     } else {
       throw new Error(`Invalid tally color value: ${color}`);
+    }
+  } else if (typeof color === "string") {
+    const colorValue = TallyColor[color as TallyColorName];
+    if (colorValue !== undefined) {
+      return colorValue;
+    } else {
+      throw new Error(`Invalid tally color name: ${color}`);
     }
   }
   switch (color) {
@@ -47,6 +56,35 @@ export function tallyColorToValue(color: TallyColor|TSL5TallyColor): TSL5TallyCo
   }
 }
 
+export function tallyColorToName(color: TallyColor|TSL5TallyColor): TallyColorName {
+  switch (color) {
+    case TallyColor.OFF:
+      return "OFF";
+    case TallyColor.RED:
+      return "RED";
+    case TallyColor.GREEN:
+      return "GREEN";
+    case TallyColor.AMBER:
+      return "AMBER";
+    default:
+      throw new Error(`Invalid tally color: ${color}`);
+  }
+}
+
+export function tallyColorNameToTallyColor(name: TallyColorName): TallyColor {
+  switch (name) {
+    case "OFF":
+      return TallyColor.OFF;
+    case "RED":
+      return TallyColor.RED;
+    case "GREEN":
+      return TallyColor.GREEN;
+    case "AMBER":
+      return TallyColor.AMBER;
+    default:
+      throw new Error(`Invalid tally color name: ${name}`);
+  }
+}
 
 export interface Tally {
   inputIndex: TallyIndex;

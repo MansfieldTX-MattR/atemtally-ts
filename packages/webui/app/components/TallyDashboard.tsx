@@ -5,9 +5,10 @@ import type {
   MapTallyRequestBody,
   TallyTSLMapItem,
   TallyTSLMapActiveState,
+  UpdateTSLMapItemRequestBody,
 } from "@atemtally/common";
 import type { TallyTSLMapWithActive, TallyTSLMapItemWithActive } from "@atemtally/common";
-import { getTSLMap, mapTallyToTSL, sendAllTalliesOff } from "../actions";
+import { getTSLMap, mapTallyToTSL, updateTSLMapItem, sendAllTalliesOff } from "../actions";
 import { useMapItemsActiveState } from "../providers/SocketProvider";
 import TSLMapTable from "./TSLMapTable";
 import MapTallyForm from "./MapTallyForm";
@@ -17,12 +18,27 @@ interface TallyDashboardProps {
   initialMap: TallyTSLMapWithActive;
 }
 
-
+function tallyTSLMapItemWithActiveToRequestBody(item: TallyTSLMapItemWithActive): UpdateTSLMapItemRequestBody {
+  return {
+    tallyId: item.tallyId,
+    bus: item.bus,
+    screen: item.screen,
+    index: item.index,
+    tallyType: item.tallyType,
+    tallyColor: item.tallyColor,
+  };
+}
 
 export default function TallyDashboard({ initialMap }: TallyDashboardProps) {
   const [tslMap, setTslMap] = useState<TallyTSLMapWithActive>(initialMap);
   const [status, setStatus] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
+
+  const editingItem: UpdateTSLMapItemRequestBody | null = editingItemId ? (() => {
+    const item = Object.values(tslMap).flat().find((i) => i.id === editingItemId);
+    return item ? tallyTSLMapItemWithActiveToRequestBody(item) : null;
+  })() : null;
 
   const handleMapItemsActiveStateChange = useCallback((itemStates: TallyTSLMapActiveState) => {
     // console.log("Received map items active state change from server: ", itemStates);
@@ -81,6 +97,35 @@ export default function TallyDashboard({ initialMap }: TallyDashboardProps) {
     }
   }
 
+  async function handleUpdateMapItem(body: MapTallyRequestBody): Promise<void> {
+    const id = editingItemId;
+    if (!id) {
+      setStatus("Error: No editing item");
+      return;
+    }
+    if (!editingItem) {
+      setStatus("Error: No editing item");
+      return;
+    }
+    setLoading(true);
+    try {
+      const result = await updateTSLMapItem(id, body);
+      if ("error" in result) {
+        if (typeof result.error === "string") {
+          setStatus(`Error: ${result.error}`);
+        } else {
+          setStatus("Error updating tally mapping");
+        }
+        return;
+      }
+      setStatus("Tally mapping updated");
+      setEditingItemId(null);
+      setTslMap(result);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function handleSendAllOff() {
     setLoading(true);
     try {
@@ -104,8 +149,27 @@ export default function TallyDashboard({ initialMap }: TallyDashboardProps) {
           {status}
         </div>
       )}
-      <TSLMapTable tslMap={tslMap} loading={loading} onRefresh={handleRefreshMap} />
-      <MapTallyForm loading={loading} onSubmit={handleMapTally} />
+      <TSLMapTable
+        tslMap={tslMap}
+        editingItemId={editingItemId || undefined}
+        loading={loading}
+        onRefresh={handleRefreshMap}
+        onEditButtonClick={setEditingItemId}
+      />
+      {editingItemId ?
+        <MapTallyForm
+          titleText={`Editing Tally ${editingItemId}`}
+          initialValues={editingItem ?? undefined}
+          loading={loading}
+          onSubmit={handleUpdateMapItem}
+          onCancel={() => setEditingItemId(null)}
+        /> :
+        <MapTallyForm
+          titleText="Map Tally to TSL"
+          loading={loading}
+          onSubmit={handleMapTally}
+        />
+      }
       <SendAllOff loading={loading} onSendAllOff={handleSendAllOff} />
     </div>
   );
