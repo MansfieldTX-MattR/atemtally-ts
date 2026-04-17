@@ -122,27 +122,27 @@ function FormField<T> ({ label, children, className }: FormFieldProps<T>) {
   );
 }
 
-function TextField({ label, value, onChange, className, fieldClassName }: FormFieldProps<string>) {
+function TextField(props: FormFieldProps<string>) {
   return (
-    <FormField label={label} value={value} onChange={onChange} className={className}>
+    <FormField {...props} >
       <input
         type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className={`${FormFieldDefaults.fieldClassName} ${fieldClassName ?? ""}`}
+        value={props.value}
+        onChange={(e) => props.onChange(e.target.value)}
+        className={`${FormFieldDefaults.fieldClassName} ${props.fieldClassName ?? ""}`}
       />
     </FormField>
   );
 }
 
-function NumberField<T extends number>({ label, value, onChange, className, fieldClassName }: FormFieldProps<T>) {
+function NumberField<T extends number>(props: FormFieldProps<T>) {
   return (
-    <FormField label={label} value={value} onChange={onChange} className={className}>
+    <FormField {...props} >
       <input
         type="number"
-        value={value}
-        onChange={(e) => onChange(typeof value === "number" ? Number(e.target.value) as T : (e.target.value as unknown as T))}
-        className={`${FormFieldDefaults.fieldClassName} ${fieldClassName ?? ""}`}
+        value={props.value}
+        onChange={(e) => props.onChange(typeof props.value === "number" ? Number(e.target.value) as T : (e.target.value as unknown as T))}
+        className={`${FormFieldDefaults.fieldClassName} ${props.fieldClassName ?? ""}`}
       />
     </FormField>
   );
@@ -157,15 +157,15 @@ interface SelectFieldProps<T extends string | number> extends FormFieldProps<T> 
   options: SelectFieldOption<T>[];
 }
 
-function SelectField<T extends string | number> ({ label, value, onChange, options, className, fieldClassName }: SelectFieldProps<T>) {
+function SelectField<T extends string | number> (props: SelectFieldProps<T>) {
   return (
-    <FormField label={label} value={value} onChange={onChange} className={className}>
+    <FormField {...props} >
       <select
-        value={value}
-        onChange={(e) => onChange(e.target.value as unknown as T)}
-        className={`${FormFieldDefaults.fieldClassName} ${fieldClassName ?? ""}`}
+        value={String(props.value)}
+        onChange={(e) => props.onChange(e.target.value as unknown as T)}
+        className={`${FormFieldDefaults.fieldClassName} ${props.fieldClassName ?? ""}`}
       >
-        {options.map((opt) => (
+        {props.options.map((opt) => (
           <option key={String(opt.value)} value={String(opt.value)}>
             {opt.label}
           </option>
