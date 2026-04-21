@@ -13,12 +13,14 @@
     "clean": "rimraf node_modules dist .turbo tsconfig.tsbuildinfo"
   },
   "dependencies": {
+    "@trpc/server": "catalog:",
     "atem-connection": "^3.9.0",
     "debug": "catalog:",
     "exit-hook": "^5.1.0",
     "express": "^5.2.1",
-    "socket.io": "catalog:",
-    "tsl-umd-v5": "catalog:"
+    "tsl-umd-v5": "catalog:",
+    "ws": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@atemtally/common": "workspace:*",
@@ -27,6 +29,7 @@
     "@types/debug": "catalog:",
     "@types/express": "^5.0.6",
     "@types/node": "catalog:",
+    "@types/ws": "catalog:",
     "eslint": "catalog:",
     "ts-node": "catalog:",
     "tsx": "^4.21.0",
