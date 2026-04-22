@@ -10,7 +10,8 @@
       "dependsOn": ["^start"]
     },
     "dev": {
-      "dependsOn": ["^dev"]
+      "cache": false,
+      "persistent": true
     },
     "typecheck": {
       "dependsOn": ["^typecheck"]
