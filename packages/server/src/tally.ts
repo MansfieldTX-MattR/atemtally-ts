@@ -319,12 +319,9 @@ export class TallyTSLMapper extends EventEmitter<TallyTSLMapperEvents> {
     };
   }
 
-  mapTallyToTSL(tally: Tally, bus: TallyBus, tallyType?: TSL5TallyType): TallyTSLMapItem {
+  mapTallyToTSL(tally: Omit<Tally, "busses" | "tallyType">, bus: TallyBus, tallyType: TSL5TallyType): TallyTSLMapItem {
     const { mixEngineIndex, inputIndex, color } = tally;
     const tallyId = getTallyMEId(mixEngineIndex, inputIndex);
-    if (tallyType === undefined) {
-      tallyType = bus === "program" ? "rh_tally" : "lh_tally";
-    }
     const tslMapItem: TallyTSLMapItemNoId = {
       tallyId,
       bus,

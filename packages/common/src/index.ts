@@ -12,6 +12,8 @@ export type {
   TallyTSLMapWithActive,
   TallyTSLMapActiveState,
   TallyColorName,
+  TallyTSLRecords,
+  TallyTSLRecordsWithActive,
 } from "./tally.js";
 
 export * from "./tally.js";

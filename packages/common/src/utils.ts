@@ -19,3 +19,17 @@ export function hash(items: (string | number | boolean)[]): string {
   }
   return (h >>> 0).toString(36);
 }
+
+
+export function ensureNumber(value: string | number | undefined, defaultValue: number): number {
+  if (typeof value === 'number') {
+    return value;
+  }
+  if (typeof value === 'string') {
+    const parsed = parseInt(value, 10);
+    if (!isNaN(parsed)) {
+      return parsed;
+    }
+  }
+  return defaultValue;
+}

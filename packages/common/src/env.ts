@@ -11,18 +11,24 @@ export interface EnvConfig {
   NEXTJS_PUBLIC_WEBSOCKET_URI: string;
   ATEM_CONFIG_FILENAME: string;
   ATEM_API_BASE_URL: string;
+  ATEM_API_PORT: number;
+  ATEM_API_WS_PORT: number;
 }
 
 export const EnvConfigTypes = {
   NEXTJS_PUBLIC_WEBSOCKET_URI: "string",
   ATEM_CONFIG_FILENAME: "string",
   ATEM_API_BASE_URL: "string",
+  ATEM_API_PORT: "number",
+  ATEM_API_WS_PORT: "number",
 } as const;
 
 export const EnvConfigDefaults: EnvConfig = {
-  NEXTJS_PUBLIC_WEBSOCKET_URI: "http://localhost:3000",
+  NEXTJS_PUBLIC_WEBSOCKET_URI: "http://localhost:3002",
   ATEM_CONFIG_FILENAME: "../../conf.json",
   ATEM_API_BASE_URL: "http://localhost:3000",
+  ATEM_API_PORT: 3000,
+  ATEM_API_WS_PORT: 3002,
 };
 
 // export function getEnvConfigVar<K extends keyof EnvConfig>(key: K): EnvConfig[K] {

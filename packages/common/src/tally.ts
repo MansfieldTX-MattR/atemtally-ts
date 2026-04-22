@@ -94,6 +94,8 @@ export interface Tally {
   name: string;
 }
 
+export type TallyTSLRecords = Record<TallyMEId, Tally>;
+export type TallyTSLRecordsWithActive = Record<TallyMEId, TallyTSLMapItemWithActive[]>;
 
 export interface TallyTSLMapItemNoId {
   tallyId: TallyMEId;
