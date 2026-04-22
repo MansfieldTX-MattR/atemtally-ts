@@ -29,8 +29,8 @@ export default function SocketProvider({socketUri, children }: { socketUri: stri
         console.log("WebSocket connection closed");
         connectedCallback(false);
       },
-      onError: () => {
-        console.error("WebSocket error");
+      onError: (evt) => {
+        console.error("WebSocket error", evt);
         connectedCallback(false);
       }
     }

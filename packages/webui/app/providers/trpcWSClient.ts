@@ -34,7 +34,7 @@ export const destroyTrpcWSClient = async () => {
 interface WSClientCallbacks {
   onOpen?: () => void;
   onClose?: () => void;
-  onError?: () => void;
+  onError?: (evt?: Event) => void;
 }
 
 
@@ -55,9 +55,9 @@ export const getTrpcWSClient = (websocketUri: string, callbacks?: WSClientCallba
       }
       destroyTrpcWSClient();
     },
-    onError: () => {
+    onError: (evt) => {
       if (callbacks?.onError) {
-        callbacks.onError();
+        callbacks.onError(evt);
       }
       destroyTrpcWSClient();
     },
