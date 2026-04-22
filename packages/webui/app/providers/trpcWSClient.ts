@@ -44,7 +44,9 @@ export const getTrpcWSClient = (websocketUri: string, callbacks?: WSClientCallba
   }
   const uriChanged = _websocketUri !== null && _websocketUri !== websocketUri;
   if (uriChanged) {
-    destroyTrpcWSClient();
+    destroyTrpcWSClient().catch((err) => {
+      console.error("Error destroying existing WebSocket client", err);
+    });
   }
   const wsClient = createWSClient({
     url: websocketUri,
@@ -53,13 +55,17 @@ export const getTrpcWSClient = (websocketUri: string, callbacks?: WSClientCallba
       if (callbacks?.onClose) {
         callbacks.onClose();
       }
-      destroyTrpcWSClient();
+      destroyTrpcWSClient().catch((err) => {
+        console.error("Error destroying WebSocket client on close", err);
+      });
     },
     onError: (evt) => {
       if (callbacks?.onError) {
         callbacks.onError(evt);
       }
-      destroyTrpcWSClient();
+      destroyTrpcWSClient().catch((err) => {
+        console.error("Error destroying WebSocket client on error", err);
+      });
     },
   });
   _trpcWSClient = createClient(wsClient);
