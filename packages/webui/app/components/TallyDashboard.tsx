@@ -95,10 +95,6 @@ export default function TallyDashboard({ initialMap }: TallyDashboardProps) {
     setLoading(true);
     try {
       const result = await mapTallyToTSL(body);
-      if ("error" in result) {
-        setStatus(`Error: ${result.error}`);
-        return null;
-      }
       setStatus("Tally mapped");
       const updated = await getTSLMap();
       setTslMap(updated);
