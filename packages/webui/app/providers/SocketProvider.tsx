@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, createContext, useContext } from "react";
+import { useState, useCallback, createContext, useContext } from "react";
 
 import { getTrpcWSClient, type TrpcWSClientType } from "./trpcWSClient";
 
@@ -15,20 +15,23 @@ const SocketContext = createContext<SocketContextType | null>(null);
 
 export default function SocketProvider({socketUri, children }: { socketUri: string, children: React.ReactNode }) {
   const [connected, setConnected] = useState(false);
+  const connectedCallback = useCallback((state: boolean) => {
+    setConnected(state);
+  }, [setConnected]);
   const [trpcClient, wsClient] = getTrpcWSClient(
     socketUri,
     {
       onOpen: () => {
         console.log("WebSocket connection opened");
-        setConnected(true);
+        connectedCallback(true);
       },
       onClose: () => {
         console.log("WebSocket connection closed");
-        setConnected(false);
+        connectedCallback(false);
       },
       onError: () => {
         console.error("WebSocket error");
-        setConnected(false);
+        connectedCallback(false);
       }
     }
   );
