@@ -2,19 +2,19 @@
 
 import { useState, useEffect, useEffectEvent } from "react";
 import type {
-  MapTallyRequestBody,
-  UpdateTSLMapItemRequestBody,
+  TallyTSLMapItemNoId,
   TallyBus,
   TallyColorName,
   TSL5TallyType,
 } from "@atemtally/common";
 import { TallyColor, tallyColorToName, tallyColorNameToTallyColor } from "@atemtally/common";
+import type { MapTallyRequestBody } from "@atemtally/server";
 
 interface MapTallyFormProps<T> {
   titleText: string;
   submitButtonText?: string;
   loading: boolean;
-  initialValues?: Partial<UpdateTSLMapItemRequestBody>;
+  initialValues?: Partial<TallyTSLMapItemNoId>;
   onCancel?: () => void;
   onSubmit: (body: MapTallyRequestBody) => Promise<T | null>;
 }
@@ -27,14 +27,14 @@ const FormFieldStateDefaults = {
   tallyType: "lh_tally",
 } as const;
 
-function updateMapItemRequestBodyToMapTallyRequestBody(body: UpdateTSLMapItemRequestBody): MapTallyRequestBody {
+function updateMapItemRequestBodyToMapTallyRequestBody(body: Partial<TallyTSLMapItemNoId>): MapTallyRequestBody {
   return {
     inputIndex: body.index ?? FormFieldStateDefaults.inputIndex,
     mixEngineIndex: body.screen ?? FormFieldStateDefaults.mixEngineIndex,
     color: body.tallyColor ?? FormFieldStateDefaults.color,
     bus: body.bus ?? FormFieldStateDefaults.bus,
     tallyType: body.tallyType ?? FormFieldStateDefaults.tallyType,
-    name: undefined,
+    name: body.name,
   };
 }
 
