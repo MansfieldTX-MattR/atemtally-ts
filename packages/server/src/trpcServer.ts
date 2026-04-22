@@ -25,14 +25,11 @@ export async function startServer(app: ReturnType<typeof createApp>, port: numbe
   return server;
 }
 
-export async function stopServer(server: ReturnType<typeof createApp>){
-  return new Promise<void>((resolve, reject) => async () => {
-    server.close((err: Error|undefined) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve();
-      }
+export async function stopServer(server: ReturnType<typeof createApp>) {
+  return new Promise<void>((resolve, reject) => {
+    server.close((err?: Error) => {
+      if (err) reject(err);
+      else resolve();
     });
   });
 }
