@@ -90,10 +90,12 @@ export interface Tally {
   inputIndex: TallyIndex;
   mixEngineIndex: MixEngineIndex;
   busses: TallyBus[];
-  color: TallyColor;
+  tallyColor: TallyColor;
   name: string;
 }
 
+export type TallyTSLRecords = Record<TallyMEId, Tally>;
+export type TallyTSLRecordsWithActive = Record<TallyMEId, TallyTSLMapItemWithActive[]>;
 
 export interface TallyTSLMapItemNoId {
   tallyId: TallyMEId;

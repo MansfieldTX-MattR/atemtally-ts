@@ -2,19 +2,19 @@
 
 import { useState, useEffect, useEffectEvent } from "react";
 import type {
-  MapTallyRequestBody,
-  UpdateTSLMapItemRequestBody,
+  TallyTSLMapItemNoId,
   TallyBus,
   TallyColorName,
   TSL5TallyType,
 } from "@atemtally/common";
 import { TallyColor, tallyColorToName, tallyColorNameToTallyColor } from "@atemtally/common";
+import type { MapTallyRequestBody } from "@atemtally/server";
 
 interface MapTallyFormProps<T> {
   titleText: string;
   submitButtonText?: string;
   loading: boolean;
-  initialValues?: Partial<UpdateTSLMapItemRequestBody>;
+  initialValues?: Partial<TallyTSLMapItemNoId>;
   onCancel?: () => void;
   onSubmit: (body: MapTallyRequestBody) => Promise<T | null>;
 }
@@ -22,19 +22,19 @@ interface MapTallyFormProps<T> {
 const FormFieldStateDefaults = {
   inputIndex: 1,
   mixEngineIndex: 0,
-  color: TallyColor.RED,
+  tallyColor: TallyColor.RED,
   bus: "program",
   tallyType: "lh_tally",
 } as const;
 
-function updateMapItemRequestBodyToMapTallyRequestBody(body: UpdateTSLMapItemRequestBody): MapTallyRequestBody {
+function updateMapItemRequestBodyToMapTallyRequestBody(body: Partial<TallyTSLMapItemNoId>): MapTallyRequestBody {
   return {
     inputIndex: body.index ?? FormFieldStateDefaults.inputIndex,
     mixEngineIndex: body.screen ?? FormFieldStateDefaults.mixEngineIndex,
-    color: body.tallyColor ?? FormFieldStateDefaults.color,
+    tallyColor: body.tallyColor ?? FormFieldStateDefaults.tallyColor,
     bus: body.bus ?? FormFieldStateDefaults.bus,
     tallyType: body.tallyType ?? FormFieldStateDefaults.tallyType,
-    name: undefined,
+    name: body.name,
   };
 }
 
@@ -42,7 +42,7 @@ export default function MapTallyForm<T>({ titleText, submitButtonText = "Submit"
   const initialUpdateBody = initialValues ? updateMapItemRequestBodyToMapTallyRequestBody(initialValues) : undefined;
   const [inputIndex, setInputIndex] = useState(initialUpdateBody?.inputIndex ?? FormFieldStateDefaults.inputIndex);
   const [mixEngineIndex, setMixEngineIndex] = useState(initialUpdateBody?.mixEngineIndex ?? FormFieldStateDefaults.mixEngineIndex);
-  const [color, setColor] = useState<TallyColor>(initialUpdateBody?.color ?? FormFieldStateDefaults.color);
+  const [tallyColor, setTallyColor] = useState<TallyColor>(initialUpdateBody?.tallyColor ?? FormFieldStateDefaults.tallyColor);
   const [bus, setBus] = useState<TallyBus>(initialUpdateBody?.bus ?? FormFieldStateDefaults.bus);
   const [tallyType, setTallyType] = useState<TSL5TallyType>(initialUpdateBody?.tallyType ?? FormFieldStateDefaults.tallyType);
   const [name, setName] = useState(initialUpdateBody?.name ?? "");
@@ -51,11 +51,11 @@ export default function MapTallyForm<T>({ titleText, submitButtonText = "Submit"
   const resetStates = useEffectEvent(() => {
     setInputIndex(initialUpdateBody?.inputIndex ?? FormFieldStateDefaults.inputIndex);
     setMixEngineIndex(initialUpdateBody?.mixEngineIndex ?? FormFieldStateDefaults.mixEngineIndex);
-    setColor(initialUpdateBody?.color ?? FormFieldStateDefaults.color);
+    setTallyColor(initialUpdateBody?.tallyColor ?? FormFieldStateDefaults.tallyColor);
     setBus(initialUpdateBody?.bus ?? FormFieldStateDefaults.bus);
     setTallyType(initialUpdateBody?.tallyType ?? FormFieldStateDefaults.tallyType);
     setName(initialUpdateBody?.name ?? "");
-    console.log("setColor: ", initialUpdateBody?.color);
+    console.log("setTallyColor: ", initialUpdateBody?.tallyColor);
     setMapResult(null);
   });
 
@@ -67,7 +67,7 @@ export default function MapTallyForm<T>({ titleText, submitButtonText = "Submit"
   const isDirty = hasInitialValues && (
     inputIndex !== initialUpdateBody?.inputIndex ||
     mixEngineIndex !== initialUpdateBody?.mixEngineIndex ||
-    color !== initialUpdateBody?.color ||
+    tallyColor !== initialUpdateBody?.tallyColor ||
     bus !== initialUpdateBody?.bus ||
     tallyType !== initialUpdateBody?.tallyType ||
     name !== initialUpdateBody?.name
@@ -79,7 +79,7 @@ export default function MapTallyForm<T>({ titleText, submitButtonText = "Submit"
     const body: MapTallyRequestBody = {
       inputIndex,
       mixEngineIndex,
-      color,
+      tallyColor,
       bus,
       tallyType,
       name: name || undefined,
@@ -106,9 +106,9 @@ export default function MapTallyForm<T>({ titleText, submitButtonText = "Submit"
         />
         <SelectField<TallyColorName>
           label="Color"
-          name="color"
-          value={tallyColorToName(color)}
-          onChange={(v) => setColor(tallyColorNameToTallyColor(v))}
+          name="tallyColor"
+          value={tallyColorToName(tallyColor)}
+          onChange={(v) => setTallyColor(tallyColorNameToTallyColor(v))}
           options={[
             { label: "Off", value: "OFF" },
             { label: "Red", value: "RED" },

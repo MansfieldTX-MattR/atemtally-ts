@@ -1,50 +1,34 @@
 "use server";
-import axios from "axios";
 
-import type {
-  MapTallyRequestBody,
-  MapTallyResponse,
-  UnmapTallyResponse,
-  GetTSLMapResponse,
-  UpdateTSLMapItemRequestBody,
-  SendAllOffResponse,
-  ErrorResponse,
-} from "@atemtally/common";
-import { API_BASE_URL as API_BASE, WEBSOCKET_URI } from "@/lib/confVars";
+import type { TallyTSLMapItemNoId } from "@atemtally/common";
+import type { MapTallyRequestBody } from "@atemtally/server";
+import { WEBSOCKET_URI } from "@/lib/confVars";
+
+import { trpcClient } from "./trpc";
 
 
-
-export async function getTSLMap(): Promise<GetTSLMapResponse> {
-  const res = await axios.get<GetTSLMapResponse>(`${API_BASE}/api/tally/map`, {
-    headers: {
-      "Cache-Control": "no-store",
-      "Pragma": "no-cache",
-      "Expires": "0",
-    }
-  });
-  return res.data;
+export async function getTSLMap() {
+  return await trpcClient.getAllTallyMaps.query();
 }
 
-export async function mapTallyToTSL(
-  body: MapTallyRequestBody
-): Promise<MapTallyResponse | ErrorResponse> {
-  const res = await axios.post<MapTallyResponse>(`${API_BASE}/api/tally/map`, body);
-  return res.data;
+export async function getTSLMapItem(id: string) {
+  return await trpcClient.getTallyMapById.query({ id });
 }
 
-export async function updateTSLMapItem(id: string, body: UpdateTSLMapItemRequestBody): Promise<GetTSLMapResponse | ErrorResponse> {
-  const res = await axios.patch<GetTSLMapResponse>(`${API_BASE}/api/tally/map/${id}`, body);
-  return res.data;
+export async function mapTallyToTSL(body: MapTallyRequestBody) {
+  return await trpcClient.createTallyMap.mutate(body);
 }
 
-export async function unmapTallyFromTSL(id: string): Promise<UnmapTallyResponse | ErrorResponse> {
-  const res = await axios.delete<UnmapTallyResponse>(`${API_BASE}/api/tally/map/${id}`);
-  return res.data;
+export async function updateTSLMapItem(id: string, body: Partial<TallyTSLMapItemNoId>) {
+  return await trpcClient.updateTallyMapItem.mutate({ id, updatedFields: body });
 }
 
-export async function sendAllTalliesOff(): Promise<SendAllOffResponse | ErrorResponse> {
-  const res = await axios.post<SendAllOffResponse>(`${API_BASE}/api/tally/off`);
-  return res.data;
+export async function unmapTallyFromTSL(id: string) {
+  return await trpcClient.deleteTallyMapById.mutate({ id });
+}
+
+export async function sendAllTalliesOff() {
+  return await trpcClient.sendAllOff.mutate();
 }
 
 

@@ -12,39 +12,13 @@ export type {
   TallyTSLMapWithActive,
   TallyTSLMapActiveState,
   TallyColorName,
+  TallyTSLRecords,
+  TallyTSLRecordsWithActive,
 } from "./tally.js";
 
 export * from "./tally.js";
 
-export type {
-  MapTallyRequestBody,
-  MapTallyResponse,
-  GetTSLMapResponse,
-  UpdateTSLMapItemRequestBody,
-  SendAllOffResponse,
-  UnmapTallyRequestParams,
-  UnmapTallyResponse,
-  ErrorResponse,
-} from "./api.js";
-
-export type {
-  ServerToClientEvents,
-  ClientToServerEvents,
-  InterServerEvents,
-  SocketData,
-  ListenEvents,
-  EmitEvents,
-  ServerSideEvents,
-  SocketIOServerConstructor,
-  SocketIOServerType,
-  SocketType,
-  ClientSocketConstructor,
-  ClientSocketType,
-} from "./socketio.js";
-
-export * from "./socketio.js";
-
-export * from "./api.js";
+export * from "./utils.js";
 
 
 export interface HostPort {

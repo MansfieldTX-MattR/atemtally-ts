@@ -1,11 +1,14 @@
 import { debug as createDebug } from "debug";
 import exitHook from "exit-hook";
 import type { Server } from "node:http";
-import { EnvConfigDefaults } from "@atemtally/common";
+import { EnvConfigDefaults, ensureNumber } from "@atemtally/common";
 import { AtemController } from "./atem";
 import { TallyTSLMapper, TallyTSLBridge } from "./tally";
 import { Config } from "./config";
-import { createApp, startServer, stopServer } from "./api";
+import { createApp, startServer, stopServer } from "./trpcServer";
+import { createWebSocketServer, stopWebSocketServer } from "./trpcWSServer";
+export type { AppRouter, MapTallyRequestBody } from "./trpcRouter";
+
 
 const debug = createDebug("atemtally:index");
 createDebug.enable("atemtally:*");
@@ -15,6 +18,12 @@ interface AppContext {
   atemController: AtemController;
   tslBridge: TallyTSLBridge;
   apiServer: Server;
+  wsServer: ReturnType<typeof createWebSocketServer>;
+}
+
+export interface ApiContext {
+  tslMapper: TallyTSLMapper;
+  tslBridge: TallyTSLBridge;
 }
 
 async function startup(): Promise<AppContext> {
@@ -34,8 +43,9 @@ async function startup(): Promise<AppContext> {
   await atemController.connect();
   debug("Starting API server...");
   const app = createApp({ tslMapper, tslBridge });
-  const apiServer = await startServer(app, 3000);
-  return { atemController, tslBridge, apiServer };
+  const apiServer = await startServer(app, ensureNumber(process.env.ATEM_API_PORT, EnvConfigDefaults.ATEM_API_PORT));
+  const wsServer = createWebSocketServer();
+  return { atemController, tslBridge, apiServer, wsServer };
 }
 
 async function shutdown(context: AppContext|null): Promise<void> {
@@ -47,11 +57,12 @@ async function shutdown(context: AppContext|null): Promise<void> {
   await context.tslBridge.sendAllTalliesOff();
   // Clean up resources, close connections, etc.
   debug("Shutting down application...");
-  await stopServer(context.apiServer);
   if (context.atemController.connected) {
     debug("Disconnecting from ATEM...");
     await context.atemController.disconnect();
   }
+  await stopServer(context.apiServer);
+  await stopWebSocketServer(context.wsServer);
   debug("Application shutdown complete");
 }
 

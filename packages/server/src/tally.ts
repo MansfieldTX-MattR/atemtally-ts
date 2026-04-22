@@ -55,7 +55,7 @@ export function getTallyColors(atem: Atem, meIndex: MixEngineIndex): Map<TallyIn
       inputIndex: input,
       mixEngineIndex: meIndex,
       busses,
-      color,
+      tallyColor: color,
     }];
   }));
 }
@@ -94,7 +94,7 @@ export class TallyCollection extends EventEmitter <TallyCollectionEvents> {
           inputIndex: inputId,
           mixEngineIndex: meIndex,
           busses: [],
-          color: TallyColor.OFF,
+          tallyColor: TallyColor.OFF,
           name,
         };
         this.tallies.set(key, tally);
@@ -123,7 +123,7 @@ export class TallyCollection extends EventEmitter <TallyCollectionEvents> {
       return;
     }
     for (const tally of this.tallies.values()) {
-      tally.color = TallyColor.OFF;
+      tally.tallyColor = TallyColor.OFF;
       tally.busses = [];
     }
     this._initialized = false;
@@ -158,11 +158,11 @@ export class TallyCollection extends EventEmitter <TallyCollectionEvents> {
       if (!this.tallies.has(key) || existingTally === undefined) {
         continue;
       }
-      if (existingTally.color !== tally.color) {
+      if (existingTally.tallyColor !== tally.tallyColor) {
         if (existingTally.inputIndex !== tally.inputIndex || existingTally.mixEngineIndex !== tally.mixEngineIndex || existingTally.mixEngineIndex !== meIndex) {
           throw new Error(`Tally key mismatch for existing tally ${existingTally.inputIndex}, ${existingTally.mixEngineIndex} and new tally ${tally.inputIndex}, ${tally.mixEngineIndex}`);
         }
-        existingTally.color = tally.color;
+        existingTally.tallyColor = tally.tallyColor;
         existingTally.busses = tally.busses;
         updatedTallies.push(existingTally);
       }
@@ -181,8 +181,8 @@ export class TallyCollection extends EventEmitter <TallyCollectionEvents> {
         if (tally.inputIndex !== inputIndex || tally.mixEngineIndex !== mixEngineIndex || mixEngineIndex !== meIndex) {
           throw new Error(`Tally key mismatch for existing tally with key ${key} and tally with input index ${tally.inputIndex} and ME index ${tally.mixEngineIndex}`);
         }
-        if (tally.color !== TallyColor.OFF) {
-          tally.color = TallyColor.OFF;
+        if (tally.tallyColor !== TallyColor.OFF) {
+          tally.tallyColor = TallyColor.OFF;
           tally.busses = [];
           updatedTallies.push(tally);
         }
@@ -319,19 +319,16 @@ export class TallyTSLMapper extends EventEmitter<TallyTSLMapperEvents> {
     };
   }
 
-  mapTallyToTSL(tally: Tally, bus: TallyBus, tallyType?: TSL5TallyType): TallyTSLMapItem {
-    const { mixEngineIndex, inputIndex, color } = tally;
+  mapTallyToTSL(tally: Omit<Tally, "busses" | "tallyType">, bus: TallyBus, tallyType: TSL5TallyType): TallyTSLMapItem {
+    const { mixEngineIndex, inputIndex, tallyColor } = tally;
     const tallyId = getTallyMEId(mixEngineIndex, inputIndex);
-    if (tallyType === undefined) {
-      tallyType = bus === "program" ? "rh_tally" : "lh_tally";
-    }
     const tslMapItem: TallyTSLMapItemNoId = {
       tallyId,
       bus,
       screen: mixEngineIndex,
       index: inputIndex,
       tallyType,
-      tallyColor: color,
+      tallyColor: tallyColor,
     };
     let items = this.tallyToTSLMap.get(tallyId);
     if (!items) {
@@ -522,7 +519,7 @@ export class TallyTSLBridge {
         mixEngineIndex,
         inputIndex,
         busses: [],
-        color: TallyColor.OFF,
+        tallyColor: TallyColor.OFF,
         name: "",
       } as Tally;
     });

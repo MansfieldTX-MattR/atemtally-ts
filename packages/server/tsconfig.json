@@ -4,6 +4,7 @@
     // File Layout
     "rootDir": "./src",
     "outDir": "./dist",
+    "moduleResolution": "nodenext",
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
@@ -18,7 +19,7 @@
 
     // // Other Outputs
     // "sourceMap": true,
-    // "declaration": true,
+    "declaration": true,
     // "declarationMap": true,
 
     // // Stricter Typechecking Options
@@ -37,7 +38,7 @@
     "strict": true,
     // "jsx": "react-jsx",
     // "verbatimModuleSyntax": true,
-    // "isolatedModules": true,
+    "isolatedModules": true,
     // "noUncheckedSideEffectImports": true,
     // "moduleDetection": "force",
     "skipLibCheck": true,

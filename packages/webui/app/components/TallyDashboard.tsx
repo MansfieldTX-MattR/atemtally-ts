@@ -1,15 +1,16 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import type {
-  MapTallyRequestBody,
   TallyTSLMapItem,
+  TallyTSLMapItemNoId,
   TallyTSLMapActiveState,
-  UpdateTSLMapItemRequestBody,
+  TallyTSLMapWithActive,
+  TallyTSLMapItemWithActive,
 } from "@atemtally/common";
-import type { TallyTSLMapWithActive, TallyTSLMapItemWithActive } from "@atemtally/common";
+import type { MapTallyRequestBody } from "@atemtally/server";
 import { getTSLMap, mapTallyToTSL, updateTSLMapItem, sendAllTalliesOff } from "../actions";
-import { useMapItemsActiveState } from "../providers/SocketProvider";
+import { useSocket } from "../providers/SocketProvider";
 import TSLMapTable from "./TSLMapTable";
 import MapTallyForm from "./MapTallyForm";
 import SendAllOff from "./SendAllOff";
@@ -18,7 +19,7 @@ interface TallyDashboardProps {
   initialMap: TallyTSLMapWithActive;
 }
 
-function tallyTSLMapItemWithActiveToRequestBody(item: TallyTSLMapItemWithActive): UpdateTSLMapItemRequestBody {
+function tallyTSLMapItemWithActiveToRequestBody(item: TallyTSLMapItemWithActive): Partial<TallyTSLMapItemNoId> {
   return {
     tallyId: item.tallyId,
     bus: item.bus,
@@ -26,6 +27,7 @@ function tallyTSLMapItemWithActiveToRequestBody(item: TallyTSLMapItemWithActive)
     index: item.index,
     tallyType: item.tallyType,
     tallyColor: item.tallyColor,
+    name: item.name,
   };
 }
 
@@ -35,7 +37,7 @@ export default function TallyDashboard({ initialMap }: TallyDashboardProps) {
   const [loading, setLoading] = useState(false);
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
 
-  const editingItem: UpdateTSLMapItemRequestBody | null = editingItemId ? (() => {
+  const editingItem: Partial<TallyTSLMapItemNoId> | null = editingItemId ? (() => {
     const item = Object.values(tslMap).flat().find((i) => i.id === editingItemId);
     return item ? tallyTSLMapItemWithActiveToRequestBody(item) : null;
   })() : null;
@@ -62,7 +64,19 @@ export default function TallyDashboard({ initialMap }: TallyDashboardProps) {
     }
   }, [tslMap, setTslMap]);
 
-  useMapItemsActiveState(handleMapItemsActiveStateChange);
+  const { socket, isConnected } = useSocket();
+
+  useEffect(() => {
+    if (!isConnected || !socket) return;
+    const subscription = socket.onMapItemsActiveChanged.subscribe(undefined, {
+      onData: handleMapItemsActiveStateChange,
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [isConnected, socket, handleMapItemsActiveStateChange]);
+
 
   async function handleRefreshMap() {
     setLoading(true);
@@ -81,10 +95,6 @@ export default function TallyDashboard({ initialMap }: TallyDashboardProps) {
     setLoading(true);
     try {
       const result = await mapTallyToTSL(body);
-      if ("error" in result) {
-        setStatus(`Error: ${result.error}`);
-        return null;
-      }
       setStatus("Tally mapped");
       const updated = await getTSLMap();
       setTslMap(updated);
@@ -110,14 +120,6 @@ export default function TallyDashboard({ initialMap }: TallyDashboardProps) {
     setLoading(true);
     try {
       const result = await updateTSLMapItem(id, body);
-      if ("error" in result) {
-        if (typeof result.error === "string") {
-          setStatus(`Error: ${result.error}`);
-        } else {
-          setStatus("Error updating tally mapping");
-        }
-        return;
-      }
       setStatus("Tally mapping updated");
       setEditingItemId(null);
       setTslMap(result);
@@ -129,12 +131,8 @@ export default function TallyDashboard({ initialMap }: TallyDashboardProps) {
   async function handleSendAllOff() {
     setLoading(true);
     try {
-      const result = await sendAllTalliesOff();
-      if ("error" in result) {
-        setStatus(`Error: ${result.error}`);
-      } else {
-        setStatus("All tallies sent off");
-      }
+      await sendAllTalliesOff();
+      setStatus("All tallies sent off");
     } catch (e) {
       setStatus(`Error: ${e instanceof Error ? e.message : String(e)}`);
     } finally {

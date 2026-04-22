@@ -3,12 +3,12 @@ import { getTSLMap } from "./actions";
 import SocketProvider from "./providers/SocketProvider";
 import TallyDashboard from "./components/TallyDashboard";
 import { getWebsocketUri } from "./actions";
-import type { GetTSLMapResponse } from "@atemtally/common";
+import type { TallyTSLRecordsWithActive } from "@atemtally/common";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  let initialMap: GetTSLMapResponse = {};
+  let initialMap: TallyTSLRecordsWithActive = {};
   try {
     initialMap = await getTSLMap();
   } catch {

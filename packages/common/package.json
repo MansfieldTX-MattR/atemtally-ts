@@ -17,8 +17,6 @@
     "@tsconfig/node22": "catalog:",
     "@types/node": "catalog:",
     "eslint": "catalog:",
-    "socket.io": "catalog:",
-    "socket.io-client": "catalog:",
     "ts-node": "catalog:",
     "typescript": "catalog:",
     "typescript-eslint": "catalog:"

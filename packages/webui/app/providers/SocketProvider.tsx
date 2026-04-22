@@ -1,13 +1,12 @@
 "use client";
 
-import { useState, useEffect, createContext, useContext } from "react";
+import { useState, useCallback, createContext, useContext } from "react";
 
-import type { ClientSocketType, ServerToClientEvents } from "@atemtally/common"
-import getSocket from "./io";
+import { getTrpcWSClient, type TrpcWSClientType } from "./trpcWSClient";
 
 
 interface SocketContextType {
-  socket: ClientSocketType;
+  socket: TrpcWSClientType;
   isConnected: boolean;
 }
 
@@ -15,41 +14,30 @@ const SocketContext = createContext<SocketContextType | null>(null);
 
 
 export default function SocketProvider({socketUri, children }: { socketUri: string, children: React.ReactNode }) {
-  const socket = getSocket(socketUri);
   const [connected, setConnected] = useState(false);
-
-  useEffect(() => {
-    if (socket.connected) {
-      console.log("Socket already connected");
-      socket.disconnect();
-      socket.connect();
+  const connectedCallback = useCallback((state: boolean) => {
+    setConnected(state);
+  }, [setConnected]);
+  const [trpcClient, wsClient] = getTrpcWSClient(
+    socketUri,
+    {
+      onOpen: () => {
+        console.log("WebSocket connection opened");
+        connectedCallback(true);
+      },
+      onClose: () => {
+        console.log("WebSocket connection closed");
+        connectedCallback(false);
+      },
+      onError: (evt) => {
+        console.error("WebSocket error", evt);
+        connectedCallback(false);
+      }
     }
-    console.log("Setting up socket connection listeners");
-    const handleConnect = () => {
-      console.log("Socket connected");
-      setConnected(true);
-    };
-
-    const handleDisconnect = () => {
-      console.log("Socket disconnected");
-      setConnected(false);
-    };
-    const handleError = (error: Error) => {
-      console.error("Socket error: ", error);
-    }
-    socket.on("connect", handleConnect);
-    socket.on("disconnect", handleDisconnect);
-    socket.on("connect_error", handleError);
-    return () => {
-      socket.off("connect", handleConnect);
-      socket.off("disconnect", handleDisconnect);
-      socket.off("connect_error", handleError);
-      socket.disconnect();
-    };
-  }, [socketUri, socket, setConnected]);
+  );
 
   return (
-    <SocketContext.Provider value={{ socket, isConnected: connected }}>
+    <SocketContext.Provider value={{ socket: trpcClient, isConnected: connected }}>
       {children}
     </SocketContext.Provider>
   );
@@ -61,17 +49,4 @@ export function useSocket() {
     throw new Error("useSocket must be used within a SocketProvider");
   }
   return context;
-}
-
-export function useMapItemsActiveState(handler: ServerToClientEvents["mapItemsActiveChanged"]) {
-  const { socket, isConnected } = useSocket();
-
-  useEffect(() => {
-    if (!isConnected || !socket) return;
-    socket.on("mapItemsActiveChanged", handler);
-
-    return () => {
-      socket.off("mapItemsActiveChanged", handler);
-    };
-  }, [socket, isConnected, handler]);
 }
