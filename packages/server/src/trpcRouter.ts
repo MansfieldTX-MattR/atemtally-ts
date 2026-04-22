@@ -52,18 +52,18 @@ export const appRouter = router({
     .input(z.object({
       inputIndex: z.number(),
       mixEngineIndex: z.number(),
-      color: zTallyColor,
+      tallyColor: zTallyColor,
       name: z.string().optional(),
       bus: zTallyBus,
       tallyType: zTallyType,
     }))
     .mutation(({ ctx, input }) => {
-      const { inputIndex, mixEngineIndex, color, name, bus, tallyType } = input;
+      const { inputIndex, mixEngineIndex, tallyColor, name, bus, tallyType } = input;
       const result = ctx.tslMapper.mapTallyToTSL(
         {
           inputIndex,
           mixEngineIndex,
-          color,
+          tallyColor,
           name: name ?? "",
         },
         bus,

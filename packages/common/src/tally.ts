@@ -90,7 +90,7 @@ export interface Tally {
   inputIndex: TallyIndex;
   mixEngineIndex: MixEngineIndex;
   busses: TallyBus[];
-  color: TallyColor;
+  tallyColor: TallyColor;
   name: string;
 }
 
