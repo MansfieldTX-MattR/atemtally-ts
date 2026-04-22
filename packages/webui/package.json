@@ -20,6 +20,7 @@
     "tsl-umd-v5": "catalog:"
   },
   "devDependencies": {
+    "@atemtally/server": "workspace:*",
     "@eslint/js": "catalog:",
     "@tailwindcss/postcss": "^4",
     "@types/debug": "catalog:",
