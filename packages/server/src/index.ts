@@ -17,7 +17,7 @@ createDebug.enable("atemtally:*");
 interface AppContext {
   atemController: AtemController;
   tslBridge: TallyTSLBridge;
-  apiServer: ReturnType<typeof createApp>;
+  apiServer: Server;
   wsServer: ReturnType<typeof createWebSocketServer>;
 }
 
