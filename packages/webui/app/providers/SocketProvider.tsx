@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffectEvent, createContext, useContext, useEffect } from "react";
+import { useState, useRef, useEffectEvent, createContext, useContext, useEffect } from "react";
 
 import { createTrpcWSClient, type TrpcWSClientType, type WSClientType } from "./trpcWSClient";
 
@@ -17,32 +17,34 @@ interface SocketContextType {
 
 const SocketContext = createContext<SocketContextType | null>(null);
 
-type BuildState = 'isNull' | 'inProgress' | 'created';
 type ClientState = 'disconnected' | 'connected';
 
 export default function SocketProvider({socketUri, children }: { socketUri: string, children: React.ReactNode }) {
-  const [buildState, setBuildState] = useState<BuildState>('isNull');
   const [clientState, setClientState] = useState<ClientState>('disconnected');
   const [client, setClient] = useState<Client | null>(null);
+  const wsClientRef = useRef<WSClientType | null>(null);
 
 
   const clearClientCallback = useEffectEvent(() => {
+    wsClientRef.current = null;
     setClient(null);
-    setBuildState('isNull');
+    setClientState('disconnected');
+  });
+
+  const closeCurrentClientCallback = useEffectEvent(() => {
+    const currentWsClient = wsClientRef.current;
+    wsClientRef.current = null;
+    if (currentWsClient) {
+      void currentWsClient.close();
+    }
+    setClient(null);
     setClientState('disconnected');
   });
 
   useEffect(() => {
-    if (buildState !== 'isNull') {
-      return;
-    }
-    let ignore = false;
+    let isMounted = true;
 
-    async function createClient(): Promise<Client | null> {
-      if (buildState !== 'isNull') {
-        return null;
-      }
-      setBuildState('inProgress');
+    async function createClient(): Promise<void> {
       const [trpcClient, wsClient] = await createTrpcWSClient(socketUri, {
         onOpen: () => {
           console.log("WebSocket connection opened");
@@ -57,27 +59,28 @@ export default function SocketProvider({socketUri, children }: { socketUri: stri
           clearClientCallback();
         }
       });
+
+      if (!isMounted) {
+        void wsClient.close();
+        return;
+      }
+
+      wsClientRef.current = wsClient;
       console.log("WebSocket client created", { trpcClient, wsClient });
-      return { trpcClient, wsClient };
+      setClient({ trpcClient, wsClient });
+      setClientState('connected');
     }
-    if (!ignore) {
-      createClient().then((newClient) => {
-        if (newClient && !ignore) {
-          setClient(newClient);
-          setClientState('connected');
-          setBuildState('created');
-        }
-      }).catch((error) => {
-        if (!ignore) {
-          console.error("Error creating WebSocket client", error);
-          clearClientCallback();
-        }
-      });
-    }
+
+    createClient().catch((error) => {
+      console.error("Error creating WebSocket client", error);
+      clearClientCallback();
+    });
+
     return () => {
-      ignore = true;
+      isMounted = false;
+      closeCurrentClientCallback();
     };
-  }, [socketUri, buildState, setBuildState, setClient, setClientState]);
+  }, [socketUri]);
 
 
   const trpcClient = client?.trpcClient || null;
