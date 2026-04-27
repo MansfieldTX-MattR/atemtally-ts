@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { useSubscription } from '@trpc/tanstack-react-query';
 import type {
   TallyTSLMapItem,
   TallyTSLMapItemNoId,
@@ -10,7 +11,7 @@ import type {
 } from "@atemtally/common";
 import type { MapTallyRequestBody } from "@atemtally/server";
 import { getTSLMap, mapTallyToTSL, updateTSLMapItem, sendAllTalliesOff } from "../actions";
-import { useSocket } from "../providers/SocketProvider";
+import { useTRPC } from "../providers/trpc";
 import TSLMapTable from "./TSLMapTable";
 import MapTallyForm from "./MapTallyForm";
 import SendAllOff from "./SendAllOff";
@@ -42,7 +43,7 @@ export default function TallyDashboard({ initialMap }: TallyDashboardProps) {
     return item ? tallyTSLMapItemWithActiveToRequestBody(item) : null;
   })() : null;
 
-  const handleMapItemsActiveStateChange = useCallback((itemStates: TallyTSLMapActiveState) => {
+  const handleMapItemsActiveStateChange = (itemStates: TallyTSLMapActiveState) => {
     // console.log("Received map items active state change from server: ", itemStates);
     let anyStateChanged = false;
     const newMap: TallyTSLMapWithActive = Object.fromEntries(
@@ -62,21 +63,15 @@ export default function TallyDashboard({ initialMap }: TallyDashboardProps) {
       setTslMap(newMap);
       // console.log("Updated TSL map with active states from server: ", newMap);
     }
-  }, [tslMap, setTslMap]);
+  };
 
-  const { socket, isConnected } = useSocket();
-
-  useEffect(() => {
-    if (!isConnected || !socket) return;
-    const subscription = socket.onMapItemsActiveChanged.subscribe(undefined, {
+  const trpc = useTRPC();
+  useSubscription(trpc.onMapItemsActiveChanged.subscriptionOptions(
+    void 0,
+    {
       onData: handleMapItemsActiveStateChange,
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [isConnected, socket, handleMapItemsActiveStateChange]);
-
+    }
+  ));
 
   async function handleRefreshMap() {
     setLoading(true);
