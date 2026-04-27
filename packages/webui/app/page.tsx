@@ -1,8 +1,7 @@
 import { Suspense } from "react";
 import { getTSLMap } from "./actions";
-import SocketProvider from "./providers/SocketProvider";
+import ReactQueryProvider from "./providers/ReactQueryProvider";
 import TallyDashboard from "./components/TallyDashboard";
-import { getWebsocketUri } from "./actions";
 import type { TallyTSLRecordsWithActive } from "@atemtally/common";
 
 export const dynamic = "force-dynamic";
@@ -22,9 +21,9 @@ export default async function Home() {
       <main className="flex flex-1 w-full max-w-3xl flex-col gap-8 py-12 px-6 bg-white dark:bg-black">
         <h1 className="text-2xl font-bold">ATEM Tally</h1>
         <Suspense fallback={<div>Loading...</div>}>
-          <SocketProvider socketUri={websocketUri.websocketUri}>
+          <ReactQueryProvider>
             <TallyDashboard initialMap={initialMap} />
-          </SocketProvider>
+          </ReactQueryProvider>
         </Suspense>
       </main>
     </div>
