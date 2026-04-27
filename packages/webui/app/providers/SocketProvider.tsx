@@ -18,7 +18,7 @@ interface SocketContextType {
 const SocketContext = createContext<SocketContextType | null>(null);
 
 type BuildState = 'isNull' | 'inProgress' | 'created';
-type ClientState = 'disconnected' | 'connecting' | 'connected';
+type ClientState = 'disconnected' | 'connected';
 
 export default function SocketProvider({socketUri, children }: { socketUri: string, children: React.ReactNode }) {
   const [buildState, setBuildState] = useState<BuildState>('isNull');
@@ -62,14 +62,16 @@ export default function SocketProvider({socketUri, children }: { socketUri: stri
     }
     if (!ignore) {
       createClient().then((newClient) => {
-        if (newClient) {
+        if (newClient && !ignore) {
           setClient(newClient);
           setClientState('connected');
           setBuildState('created');
         }
       }).catch((error) => {
-        console.error("Error creating WebSocket client", error);
-        clearClientCallback();
+        if (!ignore) {
+          console.error("Error creating WebSocket client", error);
+          clearClientCallback();
+        }
       });
     }
     return () => {
