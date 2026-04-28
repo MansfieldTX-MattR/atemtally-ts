@@ -41,25 +41,13 @@ function getQueryClient() {
   }
 }
 
-const WEBSOCKET_URI = process.env.NEXT_PUBLIC_WEBSOCKET_URI;
-
-const getWebsocketUri = (): string => {
-  if (WEBSOCKET_URI === undefined) {
-    throw new Error("Missing required environment variable NEXT_PUBLIC_WEBSOCKET_URI");
-  }
-  return WEBSOCKET_URI;
-};
-
-getWebsocketUri(); // Validate at module load time so we fail fast if it's missing
-
-
-export default function ReactQueryProvider({ children }: { children: React.ReactNode }) {
+export default function ReactQueryProvider({ websocketUri, children }: { websocketUri: string; children: React.ReactNode }) {
   const queryClient = getQueryClient();
   const [trpcClient] = useState(() => createTRPCClient<AppRouter>({
     links: [
       wsLink<AppRouter>({
         client: createWSClient({
-          url: getWebsocketUri(),
+          url: websocketUri,
         }),
       }),
     ],
