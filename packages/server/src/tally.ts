@@ -342,10 +342,7 @@ export class TallyTSLMapper extends EventEmitter<TallyTSLMapperEvents> {
     items.push(tslMapItemWithId);
     this.tallyToTSLMapById[tslMapItemWithId.id] = tslMapItemWithId;
     this.tslMapItemsActive[tslMapItemWithId.id] = false;
-    if (this.config && this.config.hasConfigFile) {
-      this.config.tallyMap = Array.from(this.tallyToTSLMap.values()).flat();
-      this.config.save();
-    }
+    this.saveToConfig();
     return tslMapItemWithId;
   }
 
@@ -366,10 +363,7 @@ export class TallyTSLMapper extends EventEmitter<TallyTSLMapperEvents> {
     items.splice(index, 1);
     delete this.tallyToTSLMapById[id];
     delete this.tslMapItemsActive[id];
-    if (this.config && this.config.hasConfigFile) {
-      this.config.tallyMap = Array.from(this.tallyToTSLMap.values()).flat();
-      this.config.save();
-    }
+    this.saveToConfig();
     return true;
   }
 
@@ -404,10 +398,7 @@ export class TallyTSLMapper extends EventEmitter<TallyTSLMapperEvents> {
     }
     items[index] = updatedItem;
     this.tallyToTSLMapById[newId] = updatedItem;
-    if (this.config && this.config.hasConfigFile) {
-      this.config.tallyMap = Array.from(this.tallyToTSLMap.values()).flat();
-      this.config.save();
-    }
+    this.saveToConfig();
     return updatedItem;
   }
 
@@ -434,6 +425,13 @@ export class TallyTSLMapper extends EventEmitter<TallyTSLMapperEvents> {
       this.tslMapItemsActive[mapItemWithId.id] = false;
     }
     debug(`Loaded TSL map with ${this.tallyToTSLMap.size} items`);
+  }
+
+  saveToConfig() {
+    if (this.config && this.config.hasConfigFile) {
+      this.config.tallyMap = Array.from(this.tallyToTSLMap.values()).flat();
+      this.config.save();
+    }
   }
 }
 
