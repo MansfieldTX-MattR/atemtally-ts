@@ -427,6 +427,22 @@ export class TallyTSLMapper extends EventEmitter<TallyTSLMapperEvents> {
     debug(`Loaded TSL map with ${this.tallyToTSLMap.size} items`);
   }
 
+  clear(saveConfig: boolean = true) {
+    this.tallyToTSLMap.clear();
+    this.tallyToTSLMapById = {};
+    this.tslMapItemsActive = {};
+    if (saveConfig) {
+      this.saveToConfig();
+    }
+  }
+
+  reloadFromConfig() {
+    if (this.config) {
+      this.clear();
+      this.loadTSLMap(this.config.tallyMap);
+    }
+  }
+
   saveToConfig() {
     if (this.config && this.config.hasConfigFile) {
       this.config.tallyMap = Array.from(this.tallyToTSLMap.values()).flat();
@@ -447,10 +463,19 @@ export class TallyTSLBridge {
     this.tsl = new TSL5();
     this.clients = new Set(clients);
     this.config = config;
+    this.reloadFromConfig();
+  }
+
+  reloadFromConfig() {
     if (this.config) {
-      for (const client of this.config.tsl5Clients) {
-        this.clients.add(client);
-      }
+      this.setClients(this.config.tsl5Clients, false);
+    }
+  }
+
+  saveToConfig() {
+    if (this.config && this.config.hasConfigFile) {
+      this.config.tsl5Clients = Array.from(this.clients);
+      this.config.save();
     }
   }
 
@@ -460,6 +485,20 @@ export class TallyTSLBridge {
 
   removeClient(client: HostPort) {
     this.clients.delete(client);
+  }
+
+  getClients(): HostPort[] {
+    return Array.from(this.clients);
+  }
+
+  setClients(clients: HostPort[], saveConfig: boolean = true) {
+    this.clients.clear();
+    for (const client of clients) {
+      this.clients.add(client);
+    }
+    if (saveConfig) {
+      this.saveToConfig();
+    }
   }
 
   async handleTallyUpdate(updatedTallies: Tally[]): Promise<void> {
