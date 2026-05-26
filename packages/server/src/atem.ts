@@ -28,7 +28,7 @@ export class AtemController extends EventEmitter<AtemEvents> {
   private running: boolean = false;
   private updatingTallies: boolean = false;
   private timeoutId: NodeJS.Timeout | null = null;
-  readonly address: AtemAddress;
+  private address: AtemAddress;
   readonly tallyCollection: TallyCollection;
   private _atemState: AtemState | null = null;
 
@@ -105,6 +105,20 @@ export class AtemController extends EventEmitter<AtemEvents> {
   get meIndices(): MixEngineIndex[] {
     return Array.from({ length: this.meCount }, (_, index) => index);
   }
+
+  async setAddress(newAddress: AtemAddress) {
+    if (newAddress === this.address) {
+      debug(`New ATEM address is the same as the current one (${newAddress}), no change needed`);
+      return;
+    }
+    debug(`Changing ATEM address from ${this.address} to ${newAddress}...`);
+    this.address = newAddress;
+    if (this.connected) {
+      await this.disconnect();
+      await this.connect();
+    }
+  }
+
 
   private async resendTalliesPeriodically(): Promise<void> {
     while (this.running) {
