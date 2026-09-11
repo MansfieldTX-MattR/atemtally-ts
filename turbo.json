@@ -7,7 +7,8 @@
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     },
     "start": {
-      "dependsOn": ["^start"]
+      "cache": false,
+      "persistent": true,
     },
     "dev": {
       "cache": false,
@@ -23,5 +24,7 @@
       "dependsOn": ["^clean"],
       "outputs": []
     }
-  }
+  },
+  "cacheMaxSize": "2gb",
+  "ui": "tui"
 }
