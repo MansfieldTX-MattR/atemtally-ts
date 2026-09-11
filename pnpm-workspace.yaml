@@ -3,6 +3,10 @@ packages:
 
 allowBuilds:
   '@julusian/freetype2': false
+  esbuild: true
+  sharp: true
+  tsl-umd-v5@https://codeload.github.com/MansfieldTX-MattR/tsl-umd-v5/tar.gz/cf2a907dd65ded20436c9f22ce9afa2b1894fd29: true
+  unrs-resolver: true
 
 catalog:
   "@eslint/js": "^9.39.4"
